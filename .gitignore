@@ -1,3 +1,4 @@
 .DS_Store
 *.devhelper
 library/bdMails/DevHelper/Generated
+library/bdMails/FileSums.php

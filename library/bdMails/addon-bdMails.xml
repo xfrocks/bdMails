@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="bdMails" title="[bd] Mails" version_string="0.9-dev" version_id="1" url="" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
+  <admin_navigation/>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="bdmails_option_providers"><![CDATA[<xen:controlunit label="{$preparedOption.title}" explain="{xen:raw $preparedOption.explain}">
+	<xen:radio name="{$fieldPrefix}[{$preparedOption.option_id}][name]" value="{$value.name}">
+		<xen:option value="">{xen:phrase default}</xen:option>
+		<xen:option value="mailgun" inputclass="Disabler Hider">Mailgun</xen:option>
+	</xen:radio>
+
+	<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />
+	{xen:raw $editLink}
+</xen:controlunit>
+
+<div id="ctrl_optionsbdMails_providername_mailgun_Disabler">
+	<xen:controlunit label="">
+		<div class="explain">
+			<p>{xen:phrase bdmails_mailgun_explain}</p>
+		</div>
+	</xen:controlunit>
+
+	<xen:textboxunit label="{xen:phrase bdmails_api_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][mailgun][api_key]" value="{$value.mailgun.api_key}" />
+	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][mailgun][domain]" value="{$value.mailgun.domain}" />
+</div>]]></template>
+  </admin_templates>
+  <admin_template_modifications>
+    <modification template="option_template_emailTransport" modification_key="bdmails_option_emailTransport_disable_default" description="Disable default choices for emailTransport option." execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[#<xen:option value="([^"]+)" label="([^"]+)">#]]></find>
+      <replace><![CDATA[<xen:option value="$1" label="$2" displayif="!({xen:helper bdMails_getOption, provider, name})">]]></replace>
+    </modification>
+    <modification template="option_template_emailTransport" modification_key="bdmails_option_emailTransport_explain" description="Update explain text for emailTransport option." execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[{xen:raw $preparedOption.explain}]]></find>
+      <replace><![CDATA[{xen:if "!{xen:helper bdMails_getOption, provider, name}",
+	"
+	$0
+
+	{xen:phrase bdmails_emailTransport_option_additional_explain,
+		'options_link={xen:adminlink options/list/bdMails}'}
+	",
+	"
+	{xen:phrase bdmails_emailTransport_option_removed_choices_explain,
+		'options_link={xen:adminlink options/list/bdMails}'}
+	"
+}]]></replace>
+    </modification>
+    <modification template="option_template_emailTransport" modification_key="bdmails_option_emailTransport_new_option" description="Insert [bd] Mails as a choice for emailTransport option." execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:explain>]]></find>
+      <replace><![CDATA[<xen:option value="bdMails" displayif="{xen:helper bdMails_getOption, provider, name}" selected="true">[bd] Mails</xen:option>
+
+$0]]></replace>
+    </modification>
+    <modification template="option_template_emailTransport" modification_key="bdmails_option_emailTransport_remove_listed_flag" description="Remove &quot;listed&quot; flag for emailTransport option." execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />]]></find>
+      <replace><![CDATA[<xen:if is="!{xen:helper bdMails_getOption, provider, name}">
+	$0
+</xen:if>]]></replace>
+    </modification>
+  </admin_template_modifications>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="file_health_check" execute_order="10" callback_class="bdMails_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
+    <listener event_id="init_dependencies" execute_order="10" callback_class="bdMails_Listener" callback_method="init_dependencies" active="1" hint="" description=""/>
+    <listener event_id="load_class_mail" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class" active="1" hint="" description=""/>
+    <listener event_id="load_class_model" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class" active="1" hint="" description=""/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups>
+    <group group_id="bdMails" display_order="9999" debug_only="0"/>
+    <option option_id="bdMails_provider" edit_format="callback" data_type="array" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params>bdMails_Option::renderProviders</edit_format_params>
+      <sub_options>*</sub_options>
+      <relation group_id="bdMails" display_order="10000"/>
+    </option>
+  </optiongroups>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="bdmails_api_key" version_id="1" version_string="0.9-dev"><![CDATA[API Key]]></phrase>
+    <phrase title="bdmails_domain" version_id="1" version_string="0.9-dev"><![CDATA[Domain]]></phrase>
+    <phrase title="bdmails_emailTransport_option_additional_explain" version_id="1" version_string="0.9-dev"><![CDATA[Other email transports are available at <a href="{options_link}" tabindex="-1">[bd] Mails options page</a>.]]></phrase>
+    <phrase title="bdmails_emailTransport_option_removed_choices_explain" version_id="1" version_string="0.9-dev"><![CDATA[A custom email transport provider has been setup for [bd] Mails add-on, in order to use default transports (sendmail or SMTP), you need to turn off the provider at <a href="{options_link}" tabindex="-1">[bd] Mails options page</a>.]]></phrase>
+    <phrase title="bdmails_mailgun_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mailgun.com/" target="_blank" tabindex="-1">Mailgun</a> and verify your domain. You can read their documentation <a href="http://documentation.mailgun.com/quickstart.html" target="_blank" tabindex="-1">here</a>.]]></phrase>
+    <phrase title="bdmails_mailgun_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires an API Key to work.]]></phrase>
+    <phrase title="bdmails_mailgun_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires a correctly configured domain to work. You can use your own domain or Mailgun's sub-domain, consult <a href="http://documentation.mailgun.com/user_manual.html#verifying-your-domain" target="_blank">their documentation</a> for more information.]]></phrase>
+    <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
+    <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
+    <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>
+    <phrase title="option_group_bdMails_description" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
+  </phrases>
+  <route_prefixes/>
+  <style_properties/>
+  <templates/>
+  <public_template_modifications/>
+  <bb_code_media_sites/>
+</addon>

@@ -69,7 +69,7 @@ class bdMails_XenForo_Mail extends XFCP_bdMails_XenForo_Mail
 		return $transport;
 	}
 
-	public static function getTransportForProvider($name, $config)
+	public static function getTransportForProvider($name, $config, $options = array())
 	{
 		$transport = null;
 
@@ -86,7 +86,20 @@ class bdMails_XenForo_Mail extends XFCP_bdMails_XenForo_Mail
 					throw new XenForo_Exception(new XenForo_Phrase('bdmails_mailgun_requires_domain'), true);
 				}
 
-				$transport = new bdMails_Transport_Mailgun($config['api_key'], $config['domain']);
+				$transport = new bdMails_Transport_Mailgun($config['api_key'], $config['domain'], $options);
+				break;
+			case 'mandrill':
+				if (empty($config['api_key']))
+				{
+					throw new XenForo_Exception(new XenForo_Phrase('bdmails_mandrill_requires_api_key'), true);
+				}
+
+				if (empty($config['domain']))
+				{
+					throw new XenForo_Exception(new XenForo_Phrase('bdmails_mandrill_requires_domain'), true);
+				}
+
+				$transport = new bdMails_Transport_Mandrill($config['api_key'], $config['domain'], $options);
 				break;
 		}
 

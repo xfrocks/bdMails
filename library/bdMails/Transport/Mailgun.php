@@ -1,30 +1,23 @@
 <?php
 
-class bdMails_Transport_Mailgun extends Zend_Mail_Transport_Abstract
+class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 {
 	public static $apiUrl = 'https://api.mailgun.net/v2';
-	public static $defaultOptions = array('from_email_template' => 'xenforo@%s');
 
 	protected $_apiKey;
 	protected $_domain;
-	protected $_options;
 
 	public function __construct($apiKey, $domain, $options = array())
 	{
+		parent::__construct($options);
+
 		$this->_apiKey = $apiKey;
 		$this->_domain = $domain;
-
-		$this->_options = array_merge(self::$defaultOptions, $options);
 	}
 
 	public function bdMails_validateFromEmail($fromEmail)
 	{
-		if (empty($fromEmail) OR !preg_match(sprintf('/^[^@]+@%s$/i', preg_quote($this->_domain, '/')), $fromEmail))
-		{
-			return sprintf($this->_options['from_email_template'], $this->_domain);
-		}
-
-		return $fromEmail;
+		return $this->_bdMails_validateFromEmailWithDomain($fromEmail, $this->_domain);
 	}
 
 	protected function _sendMail()
@@ -33,17 +26,36 @@ class bdMails_Transport_Mailgun extends Zend_Mail_Transport_Abstract
 		$client = XenForo_Helper_Http::getClient(sprintf('%s/%s/messages', self::$apiUrl, $this->_domain));
 
 		$client->setAuth('api', $this->_apiKey);
-		$mailHeaders = $this->_mail->getHeaders();
 
-		if (!empty($mailHeaders['From']))
+		$headers = $this->_bdMails_parseHeaderAsKeyValue($this->header);
+		foreach ($headers as $headerKey => $headerValue)
 		{
-			$this->_prepareHeaders(array('From' => $mailHeaders['From']));
-			$parts = explode(': ', $this->header);
-			if (count($parts) == 2)
+			$skip = false;
+
+			switch ($headerKey)
 			{
-				$request['from'] = trim($parts[1]);
+				case 'From':
+					$request['from'] = $headerValue;
+					$skip = true;
+					break;
+				case 'Content-Type':
+				case 'MIME-Version':
+				// no need because Mailgun handle the MIME stuff
+				case 'Return-Path':
+				// no need because Mailgun does bounce management
+				case 'Subject':
+				case 'To':
+					// handled below
+					$skip = true;
+					break;
+			}
+
+			if (!$skip)
+			{
+				$request[sprintf('h:%s', $headerKey)] = $headerValue;
 			}
 		}
+
 		if (empty($request['from']))
 		{
 			$request['from'] = $this->_mail->getFrom();
@@ -66,54 +78,8 @@ class bdMails_Transport_Mailgun extends Zend_Mail_Transport_Abstract
 		}
 
 		$response = $client->request('POST');
-	}
 
-	protected function _sendMailMime()
-	{
-		$request = array();
-		$client = XenForo_Helper_Http::getClient(sprintf('%s/%s/messages.mime', self::$apiUrl, $this->_domain));
-
-		$client->setAuth('api', $this->_apiKey);
-
-		$request['to'] = $this->recipients;
-		$client->setParameterPost('to', $request['to']);
-
-		$request['message'] = $this->body;
-		$client->setFileUpload('message.mime', 'message', $request['message']);
-
-		$headers = explode($this->EOL, $this->header);
-		foreach ($headers as $header)
-		{
-			$parts = explode(':', $header);
-			if (count($parts) == 2)
-			{
-				$paramName = sprintf('h:%s', trim($parts[0]));
-				$paramValue = trim($parts[1]);
-				$skip = false;
-
-				switch (strtolower($paramName))
-				{
-					case 'h:to':
-					case 'h:return-path':
-						// avoid "5.7.1 not RFC 2822 compliant" error
-						$skip = true;
-						break;
-				}
-
-				if (!$skip)
-				{
-					$request[$paramName] = $paramValue;
-					$client->setParameterPost($paramName, $paramValue);
-				}
-			}
-		}
-
-		$response = $client->request('POST');
-
-		file_put_contents(XenForo_Helper_File::getInternalDataPath() . '/mailgun/' . XenForo_Application::$time, var_export(array(
-			$request,
-			$response
-		), true));
+		$this->_bdMails_log($request, $request);
 	}
 
 }

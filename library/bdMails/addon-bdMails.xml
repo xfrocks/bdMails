@@ -8,6 +8,7 @@
 	<xen:radio name="{$fieldPrefix}[{$preparedOption.option_id}][name]" value="{$value.name}">
 		<xen:option value="">{xen:phrase default}</xen:option>
 		<xen:option value="mailgun" inputclass="Disabler Hider">Mailgun</xen:option>
+		<xen:option value="mandrill" inputclass="Disabler Hider">Mandrill</xen:option>
 	</xen:radio>
 
 	<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />
@@ -23,6 +24,17 @@
 
 	<xen:textboxunit label="{xen:phrase bdmails_api_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][mailgun][api_key]" value="{$value.mailgun.api_key}" />
 	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][mailgun][domain]" value="{$value.mailgun.domain}" />
+</div>
+
+<div id="ctrl_optionsbdMails_providername_mandrill_Disabler">
+	<xen:controlunit label="">
+		<div class="explain">
+			<p>{xen:phrase bdmails_mandrill_explain}</p>
+		</div>
+	</xen:controlunit>
+
+	<xen:textboxunit label="{xen:phrase bdmails_api_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][mandrill][api_key]" value="{$value.mandrill.api_key}" />
+	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][mandrill][domain]" value="{$value.mandrill.domain}" />
 </div>]]></template>
   </admin_templates>
   <admin_template_modifications>
@@ -70,7 +82,7 @@ $0]]></replace>
   <email_template_modifications/>
   <optiongroups>
     <group group_id="bdMails" display_order="9999" debug_only="0"/>
-    <option option_id="bdMails_provider" edit_format="callback" data_type="array" can_backup="1">
+    <option option_id="bdMails_provider" edit_format="callback" data_type="array" can_backup="1" validation_class="bdMails_Option" validation_method="verifyProvider">
       <default_value></default_value>
       <edit_format_params>bdMails_Option::renderProviders</edit_format_params>
       <sub_options>*</sub_options>
@@ -90,6 +102,9 @@ $0]]></replace>
     <phrase title="bdmails_mailgun_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mailgun.com/" target="_blank" tabindex="-1">Mailgun</a> and verify your domain. You can read their documentation <a href="http://documentation.mailgun.com/quickstart.html" target="_blank" tabindex="-1">here</a>.]]></phrase>
     <phrase title="bdmails_mailgun_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mailgun_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires a correctly configured domain to work. You can use your own domain or Mailgun's sub-domain, consult <a href="http://documentation.mailgun.com/user_manual.html#verifying-your-domain" target="_blank">their documentation</a> for more information.]]></phrase>
+    <phrase title="bdmails_mandrill_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mandrillapp.com/" target="_blank" tabindex="-1">Mandrill</a> and verify your sending domain.]]></phrase>
+    <phrase title="bdmails_mandrill_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires an API Key to work.]]></phrase>
+    <phrase title="bdmails_mandrill_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires a verified sending domain to work.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>

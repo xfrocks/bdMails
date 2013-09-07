@@ -20,7 +20,7 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 		return $this->_bdMails_validateFromEmailWithDomain($fromEmail, $this->_domain);
 	}
 
-	protected function _sendMail()
+	protected function _bdMails_sendMail()
 	{
 		$message = array(
 			'to' => array(),
@@ -109,7 +109,7 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 
 		$response = $client->request('POST');
 
-		$this->_bdMails_log($message, $response);
+		return array($message, $response);
 	}
 
 }

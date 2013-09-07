@@ -2,6 +2,8 @@
 
 abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 {
+	abstract protected function _bdMails_sendMail();
+
 	protected $_options = array();
 
 	public static $defaultOptions = array('from_email_template' => 'xenforo@%s');
@@ -18,8 +20,24 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 		return $fromEmail;
 	}
 
-	protected function _bdMails_log($request, $response)
+	protected final function _sendMail()
 	{
+		$startTime = microtime(true);
+
+		list($request, $response) = $this->_bdMails_sendMail();
+
+		$endTime = microtime(true);
+
+		$this->_bdMails_log($request, $response, array('microtime' => $endTime - $startTime));
+	}
+
+	protected function _bdMails_log($request, $response, $extraData = array())
+	{
+		if (!bdMails_Option::debugMode())
+		{
+			return;
+		}
+
 		if ($response instanceof Zend_Http_Response)
 		{
 			$response = $response->getBody();
@@ -27,7 +45,8 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 
 		file_put_contents(sprintf('%s/bdmails_%d_%s.log', XenForo_Helper_File::getInternalDataPath(), XenForo_Application::$time, md5(serialize($request))), var_export(array(
 			$request,
-			$response
+			$response,
+			$extraData,
 		), true));
 	}
 

@@ -20,7 +20,7 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 		return $this->_bdMails_validateFromEmailWithDomain($fromEmail, $this->_domain);
 	}
 
-	protected function _sendMail()
+	protected function _bdMails_sendMail()
 	{
 		$request = array();
 		$client = XenForo_Helper_Http::getClient(sprintf('%s/%s/messages', self::$apiUrl, $this->_domain));
@@ -79,7 +79,7 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 
 		$response = $client->request('POST');
 
-		$this->_bdMails_log($request, $request);
+		return array($request, $response);
 	}
 
 }

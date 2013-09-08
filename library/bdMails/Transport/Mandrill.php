@@ -100,6 +100,20 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 		$bodyHtmlMime = $this->_mail->getBodyHtml();
 		$bodyHtmlMime->encoding = '';
 		$message['html'] = $bodyHtmlMime->getContent();
+		
+		// `Sender` header validation
+		if (!empty($message['headers']['Sender']))
+		{
+			// Mandrill drops `Sender` so we have to move the
+			// `From` address to `Reply-To` header, and use the address
+			// in `Sender` for that.
+			$message['headers']['Reply-To'] = $message['from_email'];
+			$message['from_email'] = $message['headers']['Sender'];
+			unset($message['headers']['Sender']);
+		}
+		
+		// From address validation
+		$message['from_email'] = $this->bdMails_validateFromEmail($message['from_email']);
 
 		$client->setRawData(json_encode(array(
 			'key' => $this->_apiKey,

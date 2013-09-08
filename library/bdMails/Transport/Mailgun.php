@@ -72,6 +72,24 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 		$bodyHtmlMime->encoding = '';
 		$request['html'] = $bodyHtmlMime->getContent();
 
+		// `Sender` header validation
+		if (!empty($request['h:Sender']))
+		{
+			// Mailgun does forward `Sender` header but doing so is risky
+			// because according to my test, receiver server may refuse
+			// if the `From` domain blacklists foreign servers.
+			//
+			// To make sure the email gets delivered, we will move the
+			// `From` address to `Reply-To` header, and use the address
+			// in `Sender` for that. Elimating `Sender` header altogether.
+			$request['h:Reply-To'] = $request['from'];
+			$request['from'] = $request['h:Sender'];
+			unset($request['h:Sender']);
+		}
+
+		// `From` address validation
+		$request['from'] = $this->bdMails_validateFromEmail($request['from']);
+
 		foreach ($request as $key => $param)
 		{
 			$client->setParameterPost($key, $param);
@@ -79,7 +97,10 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 
 		$response = $client->request('POST');
 
-		return array($request, $response);
+		return array(
+			$request,
+			$response
+		);
 	}
 
 }

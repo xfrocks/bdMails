@@ -6,8 +6,6 @@ class bdMails_Listener
 	{
 		static $classes = array(
 			'XenForo_Mail',
-
-			'XenForo_Model_MailQueue',
 		);
 
 		if (in_array($class, $classes))
@@ -18,6 +16,8 @@ class bdMails_Listener
 
 	public static function init_dependencies(XenForo_Dependencies_Abstract $dependencies, array $data)
 	{
+		bdMails_Helper_Transport::setupTransport();
+
 		XenForo_Template_Helper_Core::$helperCallbacks['bdmails_getoption'] = array('bdMails_Option', 'get');
 	}
 	

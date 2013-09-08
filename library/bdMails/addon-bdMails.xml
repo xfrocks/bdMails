@@ -75,7 +75,6 @@ $0]]></replace>
     <listener event_id="file_health_check" execute_order="10" callback_class="bdMails_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
     <listener event_id="init_dependencies" execute_order="10" callback_class="bdMails_Listener" callback_method="init_dependencies" active="1" hint="" description=""/>
     <listener event_id="load_class_mail" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class" active="1" hint="" description=""/>
-    <listener event_id="load_class_model" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class" active="1" hint="" description=""/>
   </code_event_listeners>
   <cron/>
   <email_templates/>

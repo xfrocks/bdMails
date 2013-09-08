@@ -94,13 +94,19 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 		$message['subject'] = $this->_mail->getSubject();
 
 		$bodyTextMime = $this->_mail->getBodyText();
-		$bodyTextMime->encoding = '';
-		$message['text'] = $bodyTextMime->getContent();
+		if (!empty($bodyTextMime))
+		{
+			$bodyTextMime->encoding = '';
+			$message['text'] = $bodyTextMime->getContent();
+		}
 
 		$bodyHtmlMime = $this->_mail->getBodyHtml();
-		$bodyHtmlMime->encoding = '';
-		$message['html'] = $bodyHtmlMime->getContent();
-		
+		if (!empty($bodyHtmlMime))
+		{
+			$bodyHtmlMime->encoding = '';
+			$message['html'] = $bodyHtmlMime->getContent();
+		}
+
 		// `Sender` header validation
 		if (!empty($message['headers']['Sender']))
 		{
@@ -111,7 +117,7 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 			$message['from_email'] = $message['headers']['Sender'];
 			unset($message['headers']['Sender']);
 		}
-		
+
 		// From address validation
 		$message['from_email'] = $this->bdMails_validateFromEmail($message['from_email']);
 
@@ -123,7 +129,10 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 
 		$response = $client->request('POST');
 
-		return array($message, $response);
+		return array(
+			$message,
+			$response
+		);
 	}
 
 }

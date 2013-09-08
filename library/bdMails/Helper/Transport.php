@@ -2,6 +2,31 @@
 
 class bdMails_Helper_Transport
 {
+	public static function setupTransport()
+	{
+		$transport = null;
+		$providerName = bdMails_Option::get('provider', 'name');
+
+		if (!empty($providerName))
+		{
+			$providerConfig = bdMails_Option::get('provider', $providerName);
+
+			try
+			{
+				$transport = bdMails_Helper_Transport::getTransportForProvider($providerName, $providerConfig);
+			}
+			catch (XenForo_Exception $e)
+			{
+				XenForo_Error::logException($e, false, '[bd] Mails');
+			}
+		}
+
+		if (!empty($transport))
+		{
+			XenForo_Mail::setupTransport($transport);
+		}
+	}
+	
 	public static function getTransportForProvider($name, $config, $options = array())
 	{
 		$transport = null;

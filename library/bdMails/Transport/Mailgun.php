@@ -65,12 +65,18 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 		$request['subject'] = $this->_mail->getSubject();
 
 		$bodyTextMime = $this->_mail->getBodyText();
-		$bodyTextMime->encoding = '';
-		$request['text'] = $bodyTextMime->getContent();
+		if (!empty($bodyTextMime))
+		{
+			$bodyTextMime->encoding = '';
+			$request['text'] = $bodyTextMime->getContent();
+		}
 
 		$bodyHtmlMime = $this->_mail->getBodyHtml();
-		$bodyHtmlMime->encoding = '';
-		$request['html'] = $bodyHtmlMime->getContent();
+		if (!empty($bodyHtmlMime))
+		{
+			$bodyHtmlMime->encoding = '';
+			$request['html'] = $bodyHtmlMime->getContent();
+		}
 
 		// `Sender` header validation
 		if (!empty($request['h:Sender']))

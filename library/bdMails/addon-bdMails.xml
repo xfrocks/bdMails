@@ -9,6 +9,7 @@
 		<xen:option value="">{xen:phrase default}</xen:option>
 		<xen:option value="mailgun" inputclass="Disabler Hider">Mailgun</xen:option>
 		<xen:option value="mandrill" inputclass="Disabler Hider">Mandrill</xen:option>
+		<xen:option value="sendgrid" inputclass="Disabler Hider">SendGrid</xen:option>
 	</xen:radio>
 
 	<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />
@@ -35,6 +36,18 @@
 
 	<xen:textboxunit label="{xen:phrase bdmails_api_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][mandrill][api_key]" value="{$value.mandrill.api_key}" />
 	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][mandrill][domain]" value="{$value.mandrill.domain}" />
+</div>
+
+<div id="ctrl_optionsbdMails_providername_sendgrid_Disabler">
+	<xen:controlunit label="">
+		<div class="explain">
+			<p>{xen:phrase bdmails_sendgrid_explain}</p>
+		</div>
+	</xen:controlunit>
+
+	<xen:textboxunit label="{xen:phrase user_name}" name="{$fieldPrefix}[{$preparedOption.option_id}][sendgrid][username]" value="{$value.sendgrid.username}" />
+	<xen:textboxunit label="{xen:phrase password}" name="{$fieldPrefix}[{$preparedOption.option_id}][sendgrid][password]" value="{$value.sendgrid.password}" type="password" />
+	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][sendgrid][domain]" value="{$value.sendgrid.domain}" placeholder="sendgrid.me" explain="{xen:phrase bdmails_sendgrid_domain_explain}" />
 </div>]]></template>
   </admin_templates>
   <admin_template_modifications>
@@ -104,6 +117,9 @@ $0]]></replace>
     <phrase title="bdmails_mandrill_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mandrillapp.com/" target="_blank" tabindex="-1">Mandrill</a> and verify your sending domain.]]></phrase>
     <phrase title="bdmails_mandrill_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mandrill_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires a verified sending domain to work.]]></phrase>
+    <phrase title="bdmails_sendgrid_domain_explain" version_id="2" version_string="0.9"><![CDATA[If your SendGrid account permits whitelabel domain, enter your domain here. Otherwise, use "sendgrid.me".]]></phrase>
+    <phrase title="bdmails_sendgrid_explain" version_id="2" version_string="0.9"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://sendgrid.com/" target="_blank" tabindex="-1">SendGrid</a> and have your account provisioned.]]></phrase>
+    <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>

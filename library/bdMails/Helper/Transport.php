@@ -26,7 +26,7 @@ class bdMails_Helper_Transport
 			XenForo_Mail::setupTransport($transport);
 		}
 	}
-	
+
 	public static function getTransportForProvider($name, $config, $options = array())
 	{
 		$transport = null;
@@ -58,6 +58,23 @@ class bdMails_Helper_Transport
 				}
 
 				$transport = new bdMails_Transport_Mandrill($config['api_key'], $config['domain'], $options);
+				break;
+			case 'sendgrid':
+				if (empty($config['username']) OR empty($config['password']))
+				{
+					throw new XenForo_Exception(new XenForo_Phrase('bdmails_sendgrid_requires_username_and_password'), true);
+				}
+
+				if (empty($config['domain']))
+				{
+					$domain = 'sendgrid.me';
+				}
+				else
+				{
+					$domain = $config['domain'];
+				}
+
+				$transport = new bdMails_Transport_SendGrid($config['username'], $config['password'], $domain, $options);
 				break;
 		}
 

@@ -102,10 +102,18 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 		}
 
 		$response = $client->request('POST');
+		$responseBody = $response->getBody();
+
+		$success = false;
+		if ($response->getStatus() == 200)
+		{
+			$success = true;
+		}
 
 		return array(
 			$request,
-			$response
+			$responseBody,
+			$success,
 		);
 	}
 

@@ -85,7 +85,7 @@ class bdMails_Transport_SendGrid extends bdMails_Transport_Abstract
 			if (!empty($recipientEmail))
 			{
 				$request[sprintf('to[%d]', $requestToCount)] = $recipientEmail;
-				
+
 				if (!empty($recipientName))
 				{
 					$request[sprintf('toname[%d]', $requestToCount)] = $recipientName;
@@ -94,10 +94,10 @@ class bdMails_Transport_SendGrid extends bdMails_Transport_Abstract
 				{
 					$request[sprintf('toname[%d]', $requestToCount)] = $recipientEmail;
 				}
-				
+
 				$requestToCount++;
 			}
-		}		
+		}
 
 		$request['subject'] = $this->_mail->getSubject();
 
@@ -139,11 +139,19 @@ class bdMails_Transport_SendGrid extends bdMails_Transport_Abstract
 			}
 		}
 
-		$response = $client->request('POST');
+		$response = $client->request('POST')->getBody();
+
+		$success = false;
+		$responseArray = @json_decode($response, true);
+		if (!empty($responseArray['message']) AND $responseArray['message'] == 'success')
+		{
+			$success = true;
+		}
 
 		return array(
 			$request,
-			$response
+			$response,
+			$success,
 		);
 	}
 

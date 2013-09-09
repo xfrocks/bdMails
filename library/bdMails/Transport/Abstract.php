@@ -24,28 +24,31 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 	{
 		$startTime = microtime(true);
 
-		list($request, $response) = $this->_bdMails_sendMail();
+		list($request, $response, $success) = $this->_bdMails_sendMail();
 
 		$endTime = microtime(true);
 
-		$this->_bdMails_log($request, $response, array('microtime' => $endTime - $startTime));
+		$this->_bdMails_log($request, $response, $success, array('microtime' => $endTime - $startTime));
 	}
 
-	protected function _bdMails_log($request, $response, $extraData = array())
+	protected function _bdMails_log($request, $response, $success, $extraData = array())
 	{
-		if (!bdMails_Option::debugMode())
+		if ($success AND !bdMails_Option::debugMode())
 		{
 			return;
 		}
 
-		if ($response instanceof Zend_Http_Response)
+		$logPath = sprintf('%s/bdmails_%d_%s.log', XenForo_Helper_File::getInternalDataPath(), XenForo_Application::$time, md5(serialize($request)));
+
+		if (!$success)
 		{
-			$response = $response->getBody();
+			XenForo_Error::logException(new XenForo_Exception(sprintf('Sending mail failed, log is available at %s', $logPath)), false, '[bd] Mails: ');
 		}
 
-		file_put_contents(sprintf('%s/bdmails_%d_%s.log', XenForo_Helper_File::getInternalDataPath(), XenForo_Application::$time, md5(serialize($request))), var_export(array(
+		file_put_contents($logPath, var_export(array(
 			$request,
 			$response,
+			$success,
 			$extraData,
 		), true));
 	}

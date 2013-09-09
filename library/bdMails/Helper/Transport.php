@@ -17,7 +17,7 @@ class bdMails_Helper_Transport
 			}
 			catch (XenForo_Exception $e)
 			{
-				XenForo_Error::logException($e, false, '[bd] Mails');
+				XenForo_Error::logException($e, false, '[bd] Mails: ');
 			}
 		}
 

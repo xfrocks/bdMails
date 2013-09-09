@@ -127,11 +127,26 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 			'async' => true,
 		)));
 
-		$response = $client->request('POST');
+		$response = $client->request('POST')->getBody();
+
+		$success = false;
+		$responseArray = @json_decode($response, true);
+		if (!empty($responseArray))
+		{
+			$first = reset($responseArray);
+			if (!empty($first['status']) AND in_array($first['status'], array(
+				'sent',
+				'queued'
+			)))
+			{
+				$success = true;
+			}
+		}
 
 		return array(
 			$message,
-			$response
+			$response,
+			$success,
 		);
 	}
 

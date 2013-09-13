@@ -15,6 +15,53 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 		$this->_domain = $domain;
 	}
 
+	public function bdMails_getSupportedFeatures()
+	{
+		return array_merge(parent::bdMails_getSupportedFeatures(), array(self::FEATURE_BOUNCE => true));
+	}
+
+	public function bdMails_bounceList()
+	{
+		$client = XenForo_Helper_Http::getClient(sprintf('%s/rejects/list.json', self::$apiUrl));
+		$client->setRawData(json_encode(array('key' => $this->_apiKey)));
+		$response = $client->request('POST')->getBody();
+
+		$responseArray = @json_decode($response, true);
+		$list = array();
+
+		if (!empty($responseArray))
+		{
+			foreach ($responseArray as $reject)
+			{
+				if (is_array($reject))
+				{
+					if ($reject['reason'] !== 'hard-bounce')
+					{
+						// TODO: should we only get hard bounces?
+						// continue;
+					}
+
+					$list[$reject['email']] = array(
+						'email' => $reject['email'],
+						'reason' => $reject['detail'] ? $reject['detail'] : $reject['reason'],
+					);
+				}
+			}
+		}
+
+		return $list;
+	}
+
+	public function bdMails_bounceAdd($email)
+	{
+		return false;
+	}
+
+	public function bdMails_bounceDelete($email)
+	{
+		return false;
+	}
+
 	public function bdMails_validateFromEmail($fromEmail)
 	{
 		return $this->_bdMails_validateFromEmailWithDomain($fromEmail, $this->_domain);

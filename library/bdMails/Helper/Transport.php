@@ -25,6 +25,8 @@ class bdMails_Helper_Transport
 		{
 			XenForo_Mail::setupTransport($transport);
 		}
+		
+		return $transport;
 	}
 
 	public static function getTransportForProvider($name, $config, $options = array())

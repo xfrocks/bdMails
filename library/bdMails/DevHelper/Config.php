@@ -2,7 +2,11 @@
 class bdMails_DevHelper_Config extends DevHelper_Config_Base
 {
 	protected $_dataClasses = array();
-	protected $_dataPatches = array();
+	protected $_dataPatches = array(
+		'xf_user_option' => array(
+			'bdmails_bounced' => array('name' => 'bdmails_bounced', 'type' => 'string'),
+		),
+	);
 	protected $_exportPath = '/Users/sondh/XenForo/bdMails';
 	protected $_exportIncludes = array();
 

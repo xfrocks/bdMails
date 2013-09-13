@@ -2,6 +2,8 @@
 
 abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 {
+	const FEATURE_BOUNCE = 'bounce';
+
 	abstract protected function _bdMails_sendMail();
 
 	protected $_options = array();
@@ -18,6 +20,34 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 		$fromEmail = sprintf($this->_options['from_email_template'], $domain);
 
 		return $fromEmail;
+	}
+
+	public function bdMails_getSupportedFeatures()
+	{
+		return array(self::FEATURE_BOUNCE => false);
+	}
+
+	public function bdMails_doesSupportFeature($feature)
+	{
+		$features = $this->bdMails_getSupportedFeatures();
+
+		return !empty($features[$feature]);
+	}
+
+	public function bdMails_bounceList()
+	{
+		$sampleEntryOfList = array(
+			// `email` should be the key in the list
+			'email' => 'name@domain.com',
+			'reason' => 'some text',
+		);
+
+		return array();
+	}
+
+	public function bdMails_bounceDelete($email)
+	{
+		return false;
 	}
 
 	protected final function _sendMail()

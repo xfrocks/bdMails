@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="bdMails" title="[bd] Mails" version_string="0.9" version_id="2" url="" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
+<addon addon_id="bdMails" title="[bd] Mails" version_string="0.9" version_id="2" url="" install_callback_class="bdMails_Installer" install_callback_method="install" uninstall_callback_class="bdMails_Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -86,10 +86,15 @@ $0]]></replace>
   <code_events/>
   <code_event_listeners>
     <listener event_id="file_health_check" execute_order="10" callback_class="bdMails_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
+    <listener event_id="front_controller_pre_view" execute_order="10" callback_class="bdMails_Listener" callback_method="front_controller_pre_view" active="1" hint="" description=""/>
     <listener event_id="init_dependencies" execute_order="10" callback_class="bdMails_Listener" callback_method="init_dependencies" active="1" hint="" description=""/>
+    <listener event_id="load_class_datawriter" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class" active="1" hint="" description=""/>
     <listener event_id="load_class_mail" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class" active="1" hint="" description=""/>
+    <listener event_id="visitor_setup" execute_order="10" callback_class="bdMails_Listener" callback_method="visitor_setup" active="1" hint="" description=""/>
   </code_event_listeners>
-  <cron/>
+  <cron>
+    <entry entry_id="bdMails_bounce" cron_class="bdMails_CronEntry_Bounce" cron_method="run" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["5"],"minutes":["6"]}]]></entry>
+  </cron>
   <email_templates/>
   <email_template_modifications/>
   <optiongroups>
@@ -117,9 +122,13 @@ $0]]></replace>
     <phrase title="bdmails_mandrill_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mandrillapp.com/" target="_blank" tabindex="-1">Mandrill</a> and verify your sending domain.]]></phrase>
     <phrase title="bdmails_mandrill_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mandrill_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires a verified sending domain to work.]]></phrase>
+    <phrase title="bdmails_must_use_different_email_address" version_id="2" version_string="0.9"><![CDATA[You must use a different email address from the last one. Please try another.]]></phrase>
+    <phrase title="bdmails_notice_update_email" version_id="2" version_string="0.9"><![CDATA[Update Email]]></phrase>
     <phrase title="bdmails_sendgrid_domain_explain" version_id="2" version_string="0.9"><![CDATA[If your SendGrid account permits whitelabel domain, enter your domain here. Otherwise, use "sendgrid.me".]]></phrase>
     <phrase title="bdmails_sendgrid_explain" version_id="2" version_string="0.9"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://sendgrid.com/" target="_blank" tabindex="-1">SendGrid</a> and have your account provisioned.]]></phrase>
     <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>
+    <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
+    <phrase title="cron_entry_bdMails_bounce" version_id="2" version_string="0.9"><![CDATA[[bd] Mails: Bounce Processing]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>
@@ -127,7 +136,14 @@ $0]]></replace>
   </phrases>
   <route_prefixes/>
   <style_properties/>
-  <templates/>
+  <templates>
+    <template title="bdmails_notice_update_email" version_id="2" version_string="0.9"><![CDATA[{xen:phrase bdmails_your_email_bounced_reason_x,
+	'email={$visitor._bdMails_bounced.email}',
+	'reason={$visitor._bdMails_bounced.reason}',
+	'boardTitle={$xenOptions.boardTitle}'
+}<br />
+<a href="{xen:link account/contact-details}">{xen:phrase bdmails_notice_update_email}</a>]]></template>
+  </templates>
   <public_template_modifications/>
   <bb_code_media_sites/>
 </addon>

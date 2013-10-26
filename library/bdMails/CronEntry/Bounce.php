@@ -21,6 +21,8 @@ class bdMails_CronEntry_Bounce
 				/* @var $userModel XenForo_Model_User */
 				$userModel = XenForo_Model::create('XenForo_Model_User');
 
+				$superAdmins = preg_split('#\s*,\s*#', XenForo_Application::get('config')->superAdmins, -1, PREG_SPLIT_NO_EMPTY);
+
 				$users = $userModel->getUsers(array(
 					'emails' => array_keys($emails),
 					'user_state' => array(
@@ -35,6 +37,12 @@ class bdMails_CronEntry_Bounce
 					if (empty($emails[$emailLower]))
 					{
 						// bounce of this user cannot be found
+						continue;
+					}
+
+					if (in_array($user['user_id'], $superAdmins))
+					{
+						// we should not alter super admin user record
 						continue;
 					}
 

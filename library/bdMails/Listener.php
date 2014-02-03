@@ -50,6 +50,13 @@ class bdMails_Listener
 
 		if ($visitor->get('user_state') == 'email_confirm_edit' AND !!$visitor->get('bdmails_bounced') AND !$visitor->get('email'))
 		{
+			// XenForo 1.3.0 starts supporting a new notice of type 'isEmailBouncing'
+			// however, our old logic to display our own notice here is still kept
+			// for legacy support (e.g. users who got email bounced in XenForo 1.2.0
+			// and the site was updated to XenForo 1.3.0 etc.) Generally, this should not run
+			// within XenForo 1.3.0 because our cron uses the new user state (email_bounce)
+			// instead of email_confirm_edit
+
 			$dependencies = $viewRenderer->getDependencyHandler();
 			$notices = &$dependencies->notices;
 

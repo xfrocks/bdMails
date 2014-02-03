@@ -51,8 +51,18 @@ class bdMails_CronEntry_Bounce
 					$userDw = XenForo_DataWriter::create('XenForo_DataWriter_User');
 					$userDw->setOption(XenForo_DataWriter_User::OPTION_ADMIN_EDIT, true);
 					$userDw->setExistingData($user, true);
-					$userDw->set('user_state', 'email_confirm_edit');
-					$userDw->set('email', '');
+
+					if (XenForo_Application::$versionId > 1030000)
+					{
+						// XenForo 1.3.0 starts dealing with bounced email
+						$userDw->set('user_state', 'email_bounce');
+					}
+					else
+					{
+						$userDw->set('user_state', 'email_confirm_edit');
+						$userDw->set('email', '');
+					}
+
 					$userDw->set('bdmails_bounced', serialize($bounce));
 					$userDw->save();
 

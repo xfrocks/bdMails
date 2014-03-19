@@ -142,12 +142,21 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 
 	protected function _bdMails_validateFromEmailWithDomain($fromEmail, $domain)
 	{
-		if (empty($fromEmail) OR !preg_match(sprintf('/^[^@]+@%s$/i', preg_quote($domain, '/')), $fromEmail))
+		list($email, $name) = $this->_bdMails_parseFormattedAddress($fromEmail);
+
+		if (empty($email) OR !preg_match(sprintf('/^[^@]+@%s$/i', preg_quote($domain, '/')), $email))
 		{
-			return $this->bdMails_getDefaultFromEmail($domain);
+			$email = $this->bdMails_getDefaultFromEmail($domain);
 		}
 
-		return $fromEmail;
+		if (empty($name))
+		{
+			return $email;
+		}
+		else
+		{
+			return sprintf('"%1$s" <%2$s>', $name, $email);
+		}
 	}
 
 }

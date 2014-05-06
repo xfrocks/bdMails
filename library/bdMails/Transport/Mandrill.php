@@ -138,7 +138,7 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
 			}
 		}
 
-		$message['subject'] = $this->_mail->getSubject();
+		$message['subject'] = $this->_bdMails_getSubject();
 
 		$bodyTextMime = $this->_mail->getBodyText();
 		if (!empty($bodyTextMime))

@@ -62,7 +62,7 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 		}
 
 		$request['to'] = $this->recipients;
-		$request['subject'] = $this->_mail->getSubject();
+		$request['subject'] = $this->_bdMails_getSubject();
 
 		$bodyTextMime = $this->_mail->getBodyText();
 		if (!empty($bodyTextMime))

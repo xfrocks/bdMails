@@ -83,6 +83,91 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 		), true));
 	}
 
+	protected function _bdMails_decodeEncodedHeader($headerValue)
+	{
+		$parts = array();
+		while (true)
+		{
+			if (preg_match('#^[^=]*=\?[^\?]+\?(?<mode>B|Q)\?(?<encoded>[^\?]+)\?=#', $headerValue, $matches))
+			{
+				$str = '';
+
+				if ($matches['mode'] == 'Q')
+				{
+					// quoted printable
+					$str = $matches['encoded'];
+					$str = str_replace(array(
+						'=3F',
+						'=22',
+						'=28',
+						'=29',
+						'=2C',
+						'=2E',
+						'=3A',
+						'=3B',
+						'=3C',
+						'=3E',
+						'=40',
+						'=5B',
+						'=5C',
+						'=5D',
+						'=20',
+						'=5F'
+					), array(
+						'?',
+						'"',
+						'(',
+						')',
+						',',
+						'.',
+						':',
+						';',
+						'<',
+						'>',
+						'@',
+						'[',
+						'\\',
+						']',
+						' ',
+						'_'
+					), $str);
+					$str = str_replace(Zend_Mime::$qpReplaceValues, Zend_Mime::$qpKeys, $str);
+					$str = str_replace('=3D', '=', $str);
+				}
+				else
+				{
+					// base64
+					// TODO: support other encoding scheme?
+					$str = $matches['encoded'];
+					$str = base64_decode(str_replace(Zend_Mime::LINEEND, '', $str));
+				}
+
+				$parts[] = $str;
+
+				$headerValue = substr($headerValue, strlen($matches[0]));
+			}
+			else
+			{
+				break;
+			}
+		}
+		if (!empty($parts))
+		{
+			$headerValue = implode('', $parts);
+		}
+
+		return $headerValue;
+	}
+
+	protected function _bdMails_getSubject()
+	{
+		$subject = $this->_mail->getSubject();
+
+		$subject = $this->_bdMails_decodeEncodedHeader($subject);
+
+		return $subject;
+	}
+
 	protected function _bdMails_parseHeaderAsKeyValue($header)
 	{
 		$lines = explode($this->EOL, $header);
@@ -111,6 +196,8 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 						$value .= $this->EOL . ' ' . $nextLine;
 					}
 				}
+
+				$value = $this->_bdMails_decodeEncodedHeader($value);
 
 				$parsed[$key] = $value;
 			}

@@ -148,13 +148,12 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 			}
 			else
 			{
+				$parts[] = $headerValue;
 				break;
 			}
 		}
-		if (!empty($parts))
-		{
-			$headerValue = implode('', $parts);
-		}
+
+		$headerValue = implode('', $parts);
 
 		return $headerValue;
 	}

@@ -27,7 +27,14 @@ class bdMails_XenForo_DataWriter_User extends XFCP_bdMails_XenForo_DataWriter_Us
 
 				if (utf8_strtolower($email) === utf8_strtolower($bouncedArray['email']))
 				{
-					throw new XenForo_Exception(new XenForo_Phrase('bdmails_must_use_different_email_address'), true);
+					if ($writer->getOption(XenForo_DataWriter_User::OPTION_ADMIN_EDIT))
+					{
+						// a staff member is changing the email, accept it
+					}
+					else
+					{
+						throw new XenForo_Exception(new XenForo_Phrase('bdmails_must_use_different_email_address'), true);
+					}
 				}
 
 				$this->set('bdmails_bounced', '');

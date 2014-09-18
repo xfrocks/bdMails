@@ -99,11 +99,17 @@ $0]]></replace>
   <email_template_modifications/>
   <optiongroups>
     <group group_id="bdMails" display_order="9999" debug_only="0"/>
+    <option option_id="bdMails_bounce" edit_format="onoff" data_type="unsigned_integer" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="bdMails" display_order="1000"/>
+    </option>
     <option option_id="bdMails_provider" edit_format="callback" data_type="array" can_backup="1" validation_class="bdMails_Option" validation_method="verifyProvider">
       <default_value></default_value>
       <edit_format_params>bdMails_Option::renderProviders</edit_format_params>
       <sub_options>*</sub_options>
-      <relation group_id="bdMails" display_order="10000"/>
+      <relation group_id="bdMails" display_order="10"/>
     </option>
   </optiongroups>
   <permissions>
@@ -129,6 +135,8 @@ $0]]></replace>
     <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>
     <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
     <phrase title="cron_entry_bdMails_bounce" version_id="2" version_string="0.9"><![CDATA[[bd] Mails: Bounce Processing]]></phrase>
+    <phrase title="option_bdMails_bounce" version_id="10" version_string="0.9.4"><![CDATA[Bounced Email Processing]]></phrase>
+    <phrase title="option_bdMails_bounce_explain" version_id="10" version_string="0.9.4"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Mandrill.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>

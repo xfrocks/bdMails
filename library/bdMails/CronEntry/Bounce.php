@@ -4,6 +4,11 @@ class bdMails_CronEntry_Bounce
 {
 	public static function run()
 	{
+		if (!bdMails_Option::get('bounce'))
+		{
+			return false;
+		}
+
 		$transport = bdMails_Helper_Transport::setupTransport();
 
 		if (!empty($transport) AND $transport->bdMails_doesSupportFeature(bdMails_Transport_Abstract::FEATURE_BOUNCE))

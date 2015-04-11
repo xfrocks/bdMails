@@ -7,6 +7,7 @@
     <template title="bdmails_option_providers"><![CDATA[<xen:controlunit label="{$preparedOption.title}" explain="{xen:raw $preparedOption.explain}">
 	<xen:radio name="{$fieldPrefix}[{$preparedOption.option_id}][name]" value="{$value.name}">
 		<xen:option value="">{xen:phrase default}</xen:option>
+		<xen:option value="amazonses" inputclass="Disabler Hider">Amazon SES</xen:option>
 		<xen:option value="mailgun" inputclass="Disabler Hider">Mailgun</xen:option>
 		<xen:option value="mandrill" inputclass="Disabler Hider">Mandrill</xen:option>
 		<xen:option value="sendgrid" inputclass="Disabler Hider">SendGrid</xen:option>
@@ -15,6 +16,23 @@
 	<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />
 	{xen:raw $editLink}
 </xen:controlunit>
+
+<div id="ctrl_optionsbdMails_providername_amazonses_Disabler">
+	<xen:controlunit label="">
+		<div class="explain">
+			<p>{xen:phrase bdmails_amazonses_explain}</p>
+		</div>
+	</xen:controlunit>
+
+	<xen:selectunit label="{xen:phrase bdmails_amazon_region}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][region]" value="{$value.amazonses.region}">
+		<xen:option value="us-east-1">US East (N. Virginia)</xen:option>
+		<xen:option value="us-west-2">US West (Oregon)</xen:option>
+		<xen:option value="eu-west-1">EU (Ireland)</xen:option>
+	</xen:selectunit>
+	<xen:textboxunit label="{xen:phrase bdmails_access_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][access_key]" value="{$value.amazonses.access_key}" />
+	<xen:textboxunit label="{xen:phrase bdmails_private_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][private_key]" value="{$value.amazonses.private_key}" />
+	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][domain]" value="{$value.amazonses.domain}" />
+</div>
 
 <div id="ctrl_optionsbdMails_providername_mailgun_Disabler">
 	<xen:controlunit label="">
@@ -118,6 +136,13 @@ $0]]></replace>
     <interface_groups/>
   </permissions>
   <phrases>
+    <phrase title="bdmails_access_key" version_id="11" version_string="0.9.4"><![CDATA[Access Key ID]]></phrase>
+    <phrase title="bdmails_amazonses_explain" version_id="11" version_string="0.9.4"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://console.aws.amazon.com/ses/home" target="_blank" tabindex="-1">Amazon AWS Console</a> and have your domain verified.]]></phrase>
+    <phrase title="bdmails_amazonses_requires_access_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires an access key ID to work.]]></phrase>
+    <phrase title="bdmails_amazonses_requires_domain" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a verified domain to work.]]></phrase>
+    <phrase title="bdmails_amazonses_requires_private_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a secret access key to work.]]></phrase>
+    <phrase title="bdmails_amazonses_requires_region" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a valid region to work.]]></phrase>
+    <phrase title="bdmails_amazon_region" version_id="11" version_string="0.9.4"><![CDATA[Region]]></phrase>
     <phrase title="bdmails_api_key" version_id="1" version_string="0.9-dev"><![CDATA[API Key]]></phrase>
     <phrase title="bdmails_domain" version_id="1" version_string="0.9-dev"><![CDATA[Domain]]></phrase>
     <phrase title="bdmails_emailTransport_option_additional_explain" version_id="1" version_string="0.9-dev"><![CDATA[Other email transports are available at <a href="{options_link}" tabindex="-1">[bd] Mails options page</a>.]]></phrase>
@@ -130,6 +155,7 @@ $0]]></replace>
     <phrase title="bdmails_mandrill_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires a verified sending domain to work.]]></phrase>
     <phrase title="bdmails_must_use_different_email_address" version_id="2" version_string="0.9"><![CDATA[You must use a different email address from the last one. Please try another.]]></phrase>
     <phrase title="bdmails_notice_update_email" version_id="2" version_string="0.9"><![CDATA[Update Email]]></phrase>
+    <phrase title="bdmails_private_key" version_id="11" version_string="0.9.4"><![CDATA[Secret Access Key]]></phrase>
     <phrase title="bdmails_sendgrid_domain_explain" version_id="2" version_string="0.9"><![CDATA[If your SendGrid account permits whitelabel domain, enter your domain here. Otherwise, use "sendgrid.me".]]></phrase>
     <phrase title="bdmails_sendgrid_explain" version_id="2" version_string="0.9"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://sendgrid.com/" target="_blank" tabindex="-1">SendGrid</a> and have your account provisioned.]]></phrase>
     <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>

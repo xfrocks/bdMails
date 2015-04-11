@@ -2,3 +2,4 @@
 *.devhelper
 library/bdMails/DevHelper/Generated
 library/bdMails/FileSums.php
+library/bdMails/DevHelper/XFCP

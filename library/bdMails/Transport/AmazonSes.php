@@ -70,4 +70,45 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
         );
     }
 
+    public static function doSns()
+    {
+        $contents = file_get_contents('php://input');
+        $json = json_decode($contents, true);
+
+        if (empty($json['Type'])
+            || $json['Type'] !== 'Notification'
+            || empty($json['Message'])
+        ) {
+            return false;
+        }
+
+        $notification = json_decode($json['Message'], true);
+        if (empty($notification['notificationType'])) {
+            return false;
+        }
+
+        switch ($notification['notificationType']) {
+            case 'Bounce':
+                foreach ($notification['bounce']['bouncedRecipients'] as $recipient) {
+                    $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?', $recipient['emailAddress']);
+                    if (empty($userId)) {
+                        continue;
+                    }
+
+                    $bounceType = ($notification['bounce']['bounceType'] == 'Permanent' ? 'hard' : 'soft');
+                    $bounceDate = strtotime($notification['bounce']['timestamp']);
+
+                    /** @var bdMails_Model_EmailBounce $emailBounceModel */
+                    $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
+                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($recipient, array(
+                        'email' => $recipient['emailAddress'],
+                        'reason' => $recipient['diagnosticCode'],
+                        'reason_code' => $recipient['status'],
+                    )));
+                }
+                break;
+        }
+
+        return true;
+    }
 }

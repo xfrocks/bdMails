@@ -25,6 +25,8 @@ class bdMails_CronEntry_Bounce
 			{
 				/* @var $userModel XenForo_Model_User */
 				$userModel = XenForo_Model::create('XenForo_Model_User');
+                /** @var bdMails_Model_EmailBounce $emailBounceModel */
+                $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
 
 				$superAdmins = preg_split('#\s*,\s*#', XenForo_Application::get('config')->superAdmins, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -51,33 +53,7 @@ class bdMails_CronEntry_Bounce
 						continue;
 					}
 
-					$bounce = $emails[$emailLower];
-
-					$userDw = XenForo_DataWriter::create('XenForo_DataWriter_User');
-					$userDw->setOption(XenForo_DataWriter_User::OPTION_ADMIN_EDIT, true);
-					$userDw->setExistingData($user, true);
-
-					if (XenForo_Application::$versionId > 1030000)
-					{
-						// XenForo 1.3.0 starts dealing with bounced email
-						$userDw->set('user_state', 'email_bounce');
-					}
-					else
-					{
-						$userDw->set('user_state', 'email_confirm_edit');
-						$userDw->set('email', '');
-					}
-
-					$userDw->set('bdmails_bounced', serialize($bounce));
-					$userDw->save();
-
-					XenForo_Helper_File::log('bdmails_bounce', call_user_func_array('sprintf', array(
-						'user %d: user_state %s; email %s; reason %s',
-						$user['user_id'],
-						$user['user_state'],
-						$bounce['email'],
-						$bounce['reason'],
-					)));
+                    $emailBounceModel->takeBounceAction($user['user_id'], 'hard', XenForo_Application::$time, $emails[$emailLower]);
 				}
 			}
 		}

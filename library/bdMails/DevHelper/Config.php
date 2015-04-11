@@ -8,7 +8,7 @@ class bdMails_DevHelper_Config extends DevHelper_Config_Base
 		),
 	);
 	protected $_exportPath = '/Users/sondh/XenForo/bdMails';
-	protected $_exportIncludes = array();
+	protected $_exportIncludes = array('bdmails');
 
 	/**
 	 * Return false to trigger the upgrade!

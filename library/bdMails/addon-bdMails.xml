@@ -20,7 +20,24 @@
 <div id="ctrl_optionsbdMails_providername_amazonses_Disabler">
 	<xen:controlunit label="">
 		<div class="explain">
-			<p>{xen:phrase bdmails_amazonses_explain}</p>
+			<p>
+				{xen:phrase bdmails_amazonses_explain}
+				
+				<xen:if is="{$amazonSesSubscriptionsRequired}">
+					<xen:if hascontent="true">
+						{xen:phrase bdmails_amazonses_sns, 'boardUrl={$xenOptions.boardUrl}'}
+						<xen:contentcheck>
+							<xen:if is="{$amazonSesBounceSubscribed} && !{$amazonSesComplaintSubscribed}">
+								{xen:phrase bdmails_amazonses_sns_missing_complaint}
+							<xen:elseif is="!{$amazonSesBounceSubscribed} && {$amazonSesComplaintSubscribed}" />
+								{xen:phrase bdmails_amazonses_sns_missing_bounce}
+							<xen:elseif is="!{$amazonSesBounceSubscribed} && !{$amazonSesComplaintSubscribed}" />
+								{xen:phrase bdmails_amazonses_sns_missing_both}
+							</xen:if>
+						</xen:contentcheck>
+					</xen:if>
+				</xen:if>
+			</p>
 		</div>
 	</xen:controlunit>
 
@@ -142,6 +159,10 @@ $0]]></replace>
     <phrase title="bdmails_amazonses_requires_domain" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a verified domain to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_private_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a secret access key to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_region" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a valid region to work.]]></phrase>
+    <phrase title="bdmails_amazonses_sns" version_id="11" version_string="0.9.4"><![CDATA[For bounce processing, you need to create a <a href="https://console.aws.amazon.com/sns/v2/home" target="_blank" tabindex="-1">Amazon SNS </a> Topic, subscribe with HTTP endpoint "{boardUrl}/bdmails/amazon.php" then turn on both bounce and complaint notifications for your domain.]]></phrase>
+    <phrase title="bdmails_amazonses_sns_missing_both" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: red">According to system records, SNS hasn't been setup.</span>]]></phrase>
+    <phrase title="bdmails_amazonses_sns_missing_bounce" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Complaint has been setup correctly but Bounce has not.</span>]]></phrase>
+    <phrase title="bdmails_amazonses_sns_missing_complaint" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Bounce has been setup correctly but Complaint has not.</span>]]></phrase>
     <phrase title="bdmails_amazon_region" version_id="11" version_string="0.9.4"><![CDATA[Region]]></phrase>
     <phrase title="bdmails_api_key" version_id="1" version_string="0.9-dev"><![CDATA[API Key]]></phrase>
     <phrase title="bdmails_domain" version_id="1" version_string="0.9-dev"><![CDATA[Domain]]></phrase>
@@ -162,7 +183,7 @@ $0]]></replace>
     <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
     <phrase title="cron_entry_bdMails_bounce" version_id="2" version_string="0.9"><![CDATA[[bd] Mails: Bounce Processing]]></phrase>
     <phrase title="option_bdMails_bounce" version_id="10" version_string="0.9.4"><![CDATA[Bounced Email Processing]]></phrase>
-    <phrase title="option_bdMails_bounce_explain" version_id="10" version_string="0.9.4"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Mandrill.]]></phrase>
+    <phrase title="option_bdMails_bounce_explain" version_id="11" version_string="0.9.4"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Amazon SES, Mandrill.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>

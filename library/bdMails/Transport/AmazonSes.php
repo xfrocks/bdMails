@@ -2,6 +2,8 @@
 
 class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 {
+    const DATA_REGISTRY_SUBSCRIPTIONS = 'bdMails_asSubs';
+
     public static $apiUrl = 'https://email.%s.amazonaws.com';
 
     protected $_apiUrl;
@@ -75,11 +77,27 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
         $contents = file_get_contents('php://input');
         $json = json_decode($contents, true);
 
-        if (empty($json['Type'])
-            || $json['Type'] !== 'Notification'
-            || empty($json['Message'])
-        ) {
+        if (empty($json['Type'])) {
             return false;
+        }
+
+        switch ($json['Type']) {
+            case 'SubscriptionConfirmation':
+                if (!empty($json['SubscribeURL'])) {
+                    // confirm subscription
+                    file_get_contents($json['SubscribeURL']);
+                }
+
+                return false;
+            case 'Notification':
+                if (empty($json['Message'])) {
+                    return false;
+                } else {
+                    // good, continue
+                }
+                break;
+            default:
+                return false;
         }
 
         $notification = json_decode($json['Message'], true);
@@ -88,7 +106,21 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
         }
 
         switch ($notification['notificationType']) {
+            case 'AmazonSnsSubscriptionSucceeded':
+                /** @var XenForo_Model_DataRegistry $dataRegistryModel */
+                $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
+                $subscriptions = $dataRegistryModel->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
+                if (empty($subscriptions)) {
+                    $subscriptions = array();
+                }
+                $subscriptions[$notification['message']] = true;
+                $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+                break;
             case 'Bounce':
+                if (!bdMails_Option::get('bounce')) {
+                    return false;
+                }
+
                 foreach ($notification['bounce']['bouncedRecipients'] as $recipient) {
                     $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?', $recipient['emailAddress']);
                     if (empty($userId)) {
@@ -108,6 +140,10 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                 }
                 break;
             case 'Complaint':
+                if (!bdMails_Option::get('bounce')) {
+                    return false;
+                }
+
                 foreach ($notification['complaint']['complainedRecipients'] as $recipient) {
                     $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?', $recipient['emailAddress']);
                     if (empty($userId)) {

@@ -100,10 +100,28 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 
                     /** @var bdMails_Model_EmailBounce $emailBounceModel */
                     $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
-                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($recipient, array(
+                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($notification['bounce'], array(
                         'email' => $recipient['emailAddress'],
                         'reason' => $recipient['diagnosticCode'],
                         'reason_code' => $recipient['status'],
+                    )));
+                }
+                break;
+            case 'Complaint':
+                foreach ($notification['complaint']['complainedRecipients'] as $recipient) {
+                    $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?', $recipient['emailAddress']);
+                    if (empty($userId)) {
+                        continue;
+                    }
+
+                    $bounceType = 'soft';
+                    $bounceDate = strtotime($notification['complaint']['timestamp']);
+
+                    /** @var bdMails_Model_EmailBounce $emailBounceModel */
+                    $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
+                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($notification['complaint'], array(
+                        'email' => $recipient['emailAddress'],
+                        'reason' => $notification['complaint']['complaintFeedbackType'],
                     )));
                 }
                 break;

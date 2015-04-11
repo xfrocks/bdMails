@@ -22,7 +22,7 @@ class bdMails_Model_EmailBounce extends XenForo_Model
                 'user_id' => $userId,
                 'recipient' => $bounceInfo['email'],
                 'raw_message' => '',
-                'status_code' => $bounceInfo['status'],
+                'status_code' => $bounceInfo['reason_code'],
                 'diagnostic_info' => serialize($bounceInfo),
             ));
         } elseif ($bounceType == 'hard') {

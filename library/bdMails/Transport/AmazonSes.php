@@ -25,8 +25,15 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
     {
         parent::_buildBody();
 
-        $from = $this->bdMails_validateFromEmail($this->_mail->getFrom());
-        $this->_headers['From'] = array($from, 'append' => true);
+        $from = '';
+        if (!empty($this->_headers['From'])) {
+            $from = $this->_headers['From'][0];
+        }
+        if (empty($from)) {
+            $from = $this->_mail->getFrom();
+        }
+        $validatedFrom = $this->bdMails_validateFromEmail($from);
+        $this->_headers['From'] = array($validatedFrom, 'append' => true);
     }
 
     public function bdMails_validateFromEmail($fromEmail)

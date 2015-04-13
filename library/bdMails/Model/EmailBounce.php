@@ -21,7 +21,7 @@ class bdMails_Model_EmailBounce extends XenForo_Model
                 'action_taken' => $action,
                 'user_id' => $userId,
                 'recipient' => $bounceInfo['email'],
-                'raw_message' => '',
+                'raw_message' => json_encode($bounceInfo),
                 'status_code' => $bounceInfo['reason_code'],
                 'diagnostic_info' => serialize($bounceInfo),
             ));

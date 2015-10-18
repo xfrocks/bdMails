@@ -15,49 +15,6 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
         $this->_domain = $domain;
     }
 
-    public function bdMails_getSupportedFeatures()
-    {
-        return array_merge(parent::bdMails_getSupportedFeatures(), array(self::FEATURE_BOUNCE => true));
-    }
-
-    public function bdMails_bounceList()
-    {
-        $client = XenForo_Helper_Http::getClient(sprintf('%s/rejects/list.json', self::$apiUrl));
-        $client->setRawData(json_encode(array('key' => $this->_apiKey)));
-        $response = $client->request('POST')->getBody();
-
-        $responseArray = @json_decode($response, true);
-        $list = array();
-
-        if (!empty($responseArray)) {
-            foreach ($responseArray as $reject) {
-                if (is_array($reject)) {
-                    if ($reject['reason'] !== 'hard-bounce') {
-                        // TODO: should we only get hard bounces?
-                        // continue;
-                    }
-
-                    $list[$reject['email']] = array(
-                        'email' => $reject['email'],
-                        'reason' => $reject['detail'] ? $reject['detail'] : $reject['reason'],
-                    );
-                }
-            }
-        }
-
-        return $list;
-    }
-
-    public function bdMails_bounceAdd($email)
-    {
-        return false;
-    }
-
-    public function bdMails_bounceDelete($email)
-    {
-        return false;
-    }
-
     public function bdMails_validateFromEmail($fromEmail)
     {
         return $this->_bdMails_validateFromEmailWithDomain($fromEmail, $this->_domain);
@@ -180,4 +137,142 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
         );
     }
 
+    public function bdMails_getWebhooksList()
+    {
+        $url = self::getWebhookUrl($this->_domain);
+
+        $client = XenForo_Helper_Http::getClient(sprintf('%s/webhooks/list.json', self::$apiUrl));
+        $client->setRawData(json_encode(array(
+            'key' => $this->_apiKey,
+        )));
+
+        $response = $client->request('POST')->getBody();
+
+        $hardBounce = false;
+        $softBounce = false;
+
+        $responseArray = @json_decode($response, true);
+        if (!empty($responseArray)) {
+            foreach ($responseArray as $webhook) {
+                if (!empty($webhook['url'])
+                    && $webhook['url'] === $url
+                    && !empty($webhook['events'])
+                ) {
+                    $hardBounce = (in_array('hard_bounce', $webhook['events'], true));
+                    $softBounce = (in_array('soft_bounce', $webhook['events'], true));
+                }
+            }
+        }
+
+        return array($hardBounce, $softBounce);
+    }
+
+    public function bdMails_postWebhooksAdd($hardBounce = false, $softBounce = false)
+    {
+        $events = array();
+        if ($hardBounce) {
+            $events[] = 'hard_bounce';
+        }
+        if ($softBounce) {
+            $events[] = 'soft_bounce';
+        }
+        if (empty($events)) {
+            return true;
+        }
+
+        $url = self::getWebhookUrl($this->_domain);
+
+        $client = XenForo_Helper_Http::getClient(sprintf('%s/webhooks/add.json', self::$apiUrl));
+        $client->setRawData(json_encode(array(
+            'key' => $this->_apiKey,
+            'url' => $url,
+            'description' => XenForo_Application::getOptions()->get('boardTitle'),
+            'events' => $events,
+        )));
+
+        $response = $client->request('POST')->getBody();
+
+        $success = false;
+        $responseArray = @json_decode($response, true);
+        if (!empty($responseArray['url'])
+            && $responseArray['url'] === $url
+        ) {
+            $success = true;
+        }
+
+        return $success;
+    }
+
+    public static function getWebhookUrl($domain)
+    {
+        if (XenForo_Application::debugMode()) {
+            $configUrl = XenForo_Application::getConfig()->get('bdMails_mandrillWebhookUrl');
+            if (!empty($configUrl)) {
+                return sprintf('%s?md5=%s', $configUrl, md5($domain));
+            }
+        }
+
+        return sprintf('%s/bdmails/mandrill.php?md5=%s',
+            XenForo_Application::getOptions()->get('boardUrl'),
+            md5($domain));
+    }
+
+    public static function doWebhook()
+    {
+        if (empty($_REQUEST['md5'])) {
+            return false;
+        }
+
+        if (empty($_POST['mandrill_events'])) {
+            // looks like a HEAD request for verification from Mandrill
+            // we can't rely on REQUEST_METHOD due to different server implementation though
+            /** @var XenForo_Model_DataRegistry $dataRegistryModel */
+            $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
+            $subscriptions = $dataRegistryModel->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
+            if (empty($subscriptions)) {
+                $subscriptions = array();
+            }
+            $subscriptions['mandrill'][$_REQUEST['md5']] = true;
+            $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+
+            return false;
+        }
+
+        $events = json_decode($_POST['mandrill_events'], true);
+        if (empty($events)) {
+            return false;
+        }
+
+        foreach ($events as $event) {
+            switch ($event['event']) {
+                case 'hard_bounce':
+                case 'soft_bounce':
+                    if (!bdMails_Option::get('bounce')) {
+                        continue;
+                    }
+                    if (empty($event['msg'])) {
+                        continue;
+                    }
+                    $msgRef =& $event['msg'];
+
+                    $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?',
+                        $msgRef['email']);
+                    if (empty($userId)) {
+                        continue;
+                    }
+
+                    $bounceType = ($event['event'] === 'hard_bounce' ? 'hard' : 'soft');
+                    $bounceDate = $msgRef['ts'];
+
+                    /** @var bdMails_Model_EmailBounce $emailBounceModel */
+                    $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
+                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($msgRef, array(
+                        'reason' => $msgRef['diag'],
+                    )));
+                    break;
+            }
+        }
+
+        return true;
+    }
 }

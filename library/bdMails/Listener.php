@@ -2,6 +2,13 @@
 
 class bdMails_Listener
 {
+    public static function load_class_XenForo_ControllerAdmin_Tools($class, array &$extend)
+    {
+        if ($class === 'XenForo_ControllerAdmin_Tools') {
+            $extend[] = 'bdMails_XenForo_ControllerAdmin_Tools';
+        }
+    }
+
     public static function load_class_XenForo_DataWriter_User($class, array &$extend)
     {
         if ($class === 'XenForo_DataWriter_User') {

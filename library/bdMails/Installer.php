@@ -71,6 +71,10 @@ class bdMails_Installer
 
     public static function uninstallCustomized()
     {
+        /** @var XenForo_Model_DataRegistry $dataRegistryModel */
+        $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
+        $dataRegistryModel->delete(bdMails_Transport_Abstract::DATA_REGISTRY_SUBSCRIPTIONS);
+
         bdMails_ShippableHelper_Updater::onUninstall(bdMails_Option::UPDATER_URL);
     }
 

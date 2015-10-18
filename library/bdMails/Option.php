@@ -10,35 +10,53 @@ class bdMails_Option
         $amazonSesSubscriptionsRequired = false;
         $amazonSesBounceSubscribed = false;
         $amazonSesComplaintSubscribed = false;
+        $mandrillWebhookUrl = '';
+        $mandrillWebhookAdded = false;
 
-        if (!empty($optionValue['name']) && $optionValue['name'] == 'amazonses') {
-            if (!empty($optionValue['amazonses']['domain'])) {
-                $amazonSesSubscriptionsRequired = true;
+        if (bdMails_Option::get('bounce')
+            && !empty($optionValue['name'])
+        ) {
+            /** @var XenForo_Model_DataRegistry $dataRegistryModel */
+            $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
+            $subscriptions = $dataRegistryModel->get(bdMails_Transport_Abstract::DATA_REGISTRY_SUBSCRIPTIONS);
 
-                /** @var XenForo_Model_DataRegistry $dataRegistryModel */
-                $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
-                $subscriptions = $dataRegistryModel->get(bdMails_Transport_AmazonSes::DATA_REGISTRY_SUBSCRIPTIONS);
+            switch ($optionValue['name']) {
+                case 'amazonses':
+                    if (!empty($optionValue['amazonses']['domain'])) {
+                        $amazonSesSubscriptionsRequired = true;
 
-                if (!empty($subscriptions)) {
-                    foreach ($subscriptions as $subscriptionMessage => $received) {
-                        if (strpos($subscriptionMessage, $optionValue['amazonses']['domain']) === false) {
-                            continue;
-                        }
+                        if (!empty($subscriptions['amazonses'])) {
+                            foreach ($subscriptions['amazonses'] as $subscriptionMessage => $received) {
+                                if (strpos($subscriptionMessage, $optionValue['amazonses']['domain']) === false) {
+                                    continue;
+                                }
 
-                        if (strpos($subscriptionMessage, 'Bounce') !== false) {
-                            $amazonSesBounceSubscribed = true;
-                        }
+                                if (strpos($subscriptionMessage, 'Bounce') !== false) {
+                                    $amazonSesBounceSubscribed = true;
+                                }
 
-                        if (strpos($subscriptionMessage, 'Complaint') !== false) {
-                            $amazonSesComplaintSubscribed = true;
+                                if (strpos($subscriptionMessage, 'Complaint') !== false) {
+                                    $amazonSesComplaintSubscribed = true;
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }
+                    break;
+                case 'mandrill':
+                    if (!empty($optionValue['mandrill']['domain'])) {
+                        $mandrillWebhookUrl
+                            = bdMails_Transport_Mandrill::getWebhookUrl($optionValue['mandrill']['domain']);
 
-        if (!bdMails_Option::get('bounce')) {
-            $amazonSesSubscriptionsRequired = false;
+                        if (!empty($subscriptions['mandrill'])) {
+                            foreach ($subscriptions['mandrill'] as $md5 => $received) {
+                                if (md5($optionValue['mandrill']['domain']) === $md5) {
+                                    $mandrillWebhookAdded = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
         }
 
         $editLink = $view->createTemplateObject('option_list_option_editlink', array(
@@ -57,6 +75,8 @@ class bdMails_Option
             'amazonSesSubscriptionsRequired' => $amazonSesSubscriptionsRequired,
             'amazonSesBounceSubscribed' => $amazonSesBounceSubscribed,
             'amazonSesComplaintSubscribed' => $amazonSesComplaintSubscribed,
+            'mandrillWebhookAdded' => $mandrillWebhookAdded,
+            'mandrillWebhookUrl' => $mandrillWebhookUrl,
         ));
     }
 

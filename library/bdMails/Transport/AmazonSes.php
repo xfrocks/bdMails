@@ -2,8 +2,6 @@
 
 class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 {
-    const DATA_REGISTRY_SUBSCRIPTIONS = 'bdMails_asSubs';
-
     public static $apiUrl = 'https://email.%s.amazonaws.com';
 
     protected $_apiUrl;
@@ -120,7 +118,7 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                 if (empty($subscriptions)) {
                     $subscriptions = array();
                 }
-                $subscriptions[$notification['message']] = true;
+                $subscriptions['amazonses'][$notification['message']] = true;
                 $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
                 break;
             case 'Bounce':

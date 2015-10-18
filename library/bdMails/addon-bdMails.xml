@@ -65,7 +65,15 @@
 <div id="ctrl_optionsbdMails_providername_mandrill_Disabler">
 	<xen:controlunit label="">
 		<div class="explain">
-			<p>{xen:phrase bdmails_mandrill_explain}</p>
+			<p>
+				{xen:phrase bdmails_mandrill_explain}
+				
+				<xen:if is="{$mandrillWebhookUrl} && !{$mandrillWebhookAdded}">
+					{xen:phrase bdmails_mandrill_webhook,
+						'webhookUrl={$mandrillWebhookUrl}',
+						'link={xen:adminlink tools/mandrill/webhooks/add}'}
+				</xen:if>
+			</p>
 		</div>
 	</xen:controlunit>
 
@@ -123,13 +131,12 @@ $0]]></replace>
     <listener event_id="file_health_check" execute_order="10" callback_class="bdMails_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
     <listener event_id="front_controller_pre_view" execute_order="10" callback_class="bdMails_Listener" callback_method="front_controller_pre_view" active="1" hint="" description=""/>
     <listener event_id="init_dependencies" execute_order="10" callback_class="bdMails_Listener" callback_method="init_dependencies" active="1" hint="" description=""/>
+    <listener event_id="load_class_controller" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_ControllerAdmin_Tools" active="1" hint="XenForo_ControllerAdmin_Tools" description="XenForo_ControllerAdmin_Tools"/>
     <listener event_id="load_class_datawriter" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_DataWriter_User" active="1" hint="XenForo_DataWriter_User" description="XenForo_DataWriter_User"/>
     <listener event_id="load_class_mail" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_Mail" active="1" hint="XenForo_Mail" description="XenForo_Mail"/>
     <listener event_id="visitor_setup" execute_order="10" callback_class="bdMails_Listener" callback_method="visitor_setup" active="1" hint="" description=""/>
   </code_event_listeners>
-  <cron>
-    <entry entry_id="bdMails_bounce" cron_class="bdMails_CronEntry_Bounce" cron_method="run" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["5"],"minutes":["6"]}]]></entry>
-  </cron>
+  <cron/>
   <email_templates/>
   <email_template_modifications/>
   <optiongroups>
@@ -159,7 +166,7 @@ $0]]></replace>
     <phrase title="bdmails_amazonses_requires_domain" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a verified domain to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_private_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a secret access key to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_region" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a valid region to work.]]></phrase>
-    <phrase title="bdmails_amazonses_sns" version_id="11" version_string="0.9.4"><![CDATA[For bounce processing, you need to create a <a href="https://console.aws.amazon.com/sns/v2/home" target="_blank" tabindex="-1">Amazon SNS </a> Topic, subscribe with HTTP endpoint "{boardUrl}/bdmails/amazon.php" then turn on both bounce and complaint notifications for your domain.]]></phrase>
+    <phrase title="bdmails_amazonses_sns" version_id="13" version_string="0.9.5-BETA"><![CDATA[For bounce processing, you need to create a <a href="https://console.aws.amazon.com/sns/v2/home" target="_blank" tabindex="-1">Amazon SNS</a> Topic, subscribe with HTTP endpoint "{boardUrl}/bdmails/amazon.php" then turn on both bounce and complaint notifications for your domain.]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_both" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: red">According to system records, SNS hasn't been setup.</span>]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_bounce" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Complaint has been setup correctly but Bounce has not.</span>]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_complaint" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Bounce has been setup correctly but Complaint has not.</span>]]></phrase>
@@ -174,6 +181,7 @@ $0]]></replace>
     <phrase title="bdmails_mandrill_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mandrillapp.com/" target="_blank" tabindex="-1">Mandrill</a> and verify your sending domain.]]></phrase>
     <phrase title="bdmails_mandrill_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mandrill_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires a verified sending domain to work.]]></phrase>
+    <phrase title="bdmails_mandrill_webhook" version_id="13" version_string="0.9.5-BETA"><![CDATA[For bounce processing, you need to create a <a href="https://mandrill.zendesk.com/hc/en-us/articles/205583217-Introduction-to-Webhooks" target="_blank" tabindex="-1">Webhook</a> which subscribes to bounces and post to this url: {webhookUrl}. Or you can <a href="{link}" tabindex="-1">click here</a> to create it automatically.]]></phrase>
     <phrase title="bdmails_must_use_different_email_address" version_id="2" version_string="0.9"><![CDATA[You must use a different email address from the last one. Please try another.]]></phrase>
     <phrase title="bdmails_notice_update_email" version_id="2" version_string="0.9"><![CDATA[Update Email]]></phrase>
     <phrase title="bdmails_private_key" version_id="11" version_string="0.9.4"><![CDATA[Secret Access Key]]></phrase>
@@ -181,7 +189,6 @@ $0]]></replace>
     <phrase title="bdmails_sendgrid_explain" version_id="2" version_string="0.9"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://sendgrid.com/" target="_blank" tabindex="-1">SendGrid</a> and have your account provisioned.]]></phrase>
     <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>
     <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
-    <phrase title="cron_entry_bdMails_bounce" version_id="2" version_string="0.9"><![CDATA[[bd] Mails: Bounce Processing]]></phrase>
     <phrase title="option_bdMails_bounce" version_id="10" version_string="0.9.4"><![CDATA[Bounced Email Processing]]></phrase>
     <phrase title="option_bdMails_bounce_explain" version_id="11" version_string="0.9.4"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Amazon SES, Mandrill.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>

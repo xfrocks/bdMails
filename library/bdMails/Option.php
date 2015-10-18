@@ -2,6 +2,8 @@
 
 class bdMails_Option
 {
+    const UPDATER_URL = 'https://xfrocks.com/api/index.php?updater';
+
     public static function renderProviders(XenForo_View $view, $fieldPrefix, array $preparedOption, $canEdit)
     {
         $optionValue = $preparedOption['option_value'];

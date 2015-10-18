@@ -24,6 +24,8 @@ class bdMails_Listener
             'bdMails_Option',
             'get'
         );
+
+        bdMails_ShippableHelper_Updater::onInitDependencies($dependencies, bdMails_Option::UPDATER_URL);
     }
 
     public static function visitor_setup(XenForo_Visitor &$visitor)

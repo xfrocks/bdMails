@@ -71,7 +71,7 @@ class bdMails_Installer
 
     public static function uninstallCustomized()
     {
-        // customized uninstall script goes here
+        bdMails_ShippableHelper_Updater::onUninstall(bdMails_Option::UPDATER_URL);
     }
 
 }

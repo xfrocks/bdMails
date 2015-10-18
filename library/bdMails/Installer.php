@@ -2,84 +2,76 @@
 
 class bdMails_Installer
 {
-	/* Start auto-generated lines of code. Change made will be overwriten... */
+    /* Start auto-generated lines of code. Change made will be overwriten... */
 
-	protected static $_tables = array();
-	protected static $_patches = array(
-		array(
-			'table' => 'xf_user_option',
-			'field' => 'bdmails_bounced',
-			'showTablesQuery' => 'SHOW TABLES LIKE \'xf_user_option\'',
-			'showColumnsQuery' => 'SHOW COLUMNS FROM `xf_user_option` LIKE \'bdmails_bounced\'',
-			'alterTableAddColumnQuery' => 'ALTER TABLE `xf_user_option` ADD COLUMN `bdmails_bounced` TEXT',
-			'alterTableDropColumnQuery' => 'ALTER TABLE `xf_user_option` DROP COLUMN `bdmails_bounced`',
-		),
-	);
+    protected static $_tables = array();
+    protected static $_patches = array(
+        array(
+            'table' => 'xf_user_option',
+            'field' => 'bdmails_bounced',
+            'showTablesQuery' => 'SHOW TABLES LIKE \'xf_user_option\'',
+            'showColumnsQuery' => 'SHOW COLUMNS FROM `xf_user_option` LIKE \'bdmails_bounced\'',
+            'alterTableAddColumnQuery' => 'ALTER TABLE `xf_user_option` ADD COLUMN `bdmails_bounced` TEXT',
+            'alterTableDropColumnQuery' => 'ALTER TABLE `xf_user_option` DROP COLUMN `bdmails_bounced`',
+        ),
+    );
 
-	public static function install($existingAddOn, $addOnData)
-	{
-		$db = XenForo_Application::get('db');
+    public static function install($existingAddOn, $addOnData)
+    {
+        $db = XenForo_Application::get('db');
 
-		foreach (self::$_tables as $table)
-		{
-			$db->query($table['createQuery']);
-		}
+        foreach (self::$_tables as $table) {
+            $db->query($table['createQuery']);
+        }
 
-		foreach (self::$_patches as $patch)
-		{
-			$tableExisted = $db->fetchOne($patch['showTablesQuery']);
-			if (empty($tableExisted))
-			{
-				continue;
-			}
+        foreach (self::$_patches as $patch) {
+            $tableExisted = $db->fetchOne($patch['showTablesQuery']);
+            if (empty($tableExisted)) {
+                continue;
+            }
 
-			$existed = $db->fetchOne($patch['showColumnsQuery']);
-			if (empty($existed))
-			{
-				$db->query($patch['alterTableAddColumnQuery']);
-			}
-		}
-		
-		self::installCustomized($existingAddOn, $addOnData);
-	}
+            $existed = $db->fetchOne($patch['showColumnsQuery']);
+            if (empty($existed)) {
+                $db->query($patch['alterTableAddColumnQuery']);
+            }
+        }
 
-	public static function uninstall()
-	{
-		$db = XenForo_Application::get('db');
+        self::installCustomized($existingAddOn, $addOnData);
+    }
 
-		foreach (self::$_patches as $patch)
-		{
-			$tableExisted = $db->fetchOne($patch['showTablesQuery']);
-			if (empty($tableExisted))
-			{
-				continue;
-			}
+    public static function uninstall()
+    {
+        $db = XenForo_Application::get('db');
 
-			$existed = $db->fetchOne($patch['showColumnsQuery']);
-			if (!empty($existed))
-			{
-				$db->query($patch['alterTableDropColumnQuery']);
-			}
-		}
+        foreach (self::$_patches as $patch) {
+            $tableExisted = $db->fetchOne($patch['showTablesQuery']);
+            if (empty($tableExisted)) {
+                continue;
+            }
 
-		foreach (self::$_tables as $table)
-		{
-			$db->query($table['dropQuery']);
-		}
+            $existed = $db->fetchOne($patch['showColumnsQuery']);
+            if (!empty($existed)) {
+                $db->query($patch['alterTableDropColumnQuery']);
+            }
+        }
 
-		self::uninstallCustomized();
-	}
+        foreach (self::$_tables as $table) {
+            $db->query($table['dropQuery']);
+        }
 
-	/* End auto-generated lines of code. Feel free to make changes below */
+        self::uninstallCustomized();
+    }
 
-	public static function installCustomized($existingAddOn, $addOnData)
-	{
-		// customized install script goes here
-	}
+    /* End auto-generated lines of code. Feel free to make changes below */
 
-	public static function uninstallCustomized()
-	{
-		// customized uninstall script goes here
-	}
-	
+    public static function installCustomized($existingAddOn, $addOnData)
+    {
+        // customized install script goes here
+    }
+
+    public static function uninstallCustomized()
+    {
+        // customized uninstall script goes here
+    }
+
 }

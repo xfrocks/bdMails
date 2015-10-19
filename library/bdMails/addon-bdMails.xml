@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="bdMails" title="[bd] Mails" version_string="0.9.5-BETA" version_id="13" url="" install_callback_class="bdMails_Installer" install_callback_method="install" uninstall_callback_class="bdMails_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="bdMails" title="[bd] Mails" version_string="1.0.0" version_id="14" url="" install_callback_class="bdMails_Installer" install_callback_method="install" uninstall_callback_class="bdMails_Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -199,7 +199,7 @@ $0]]></replace>
     <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>
     <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
     <phrase title="option_bdMails_bounce" version_id="10" version_string="0.9.4"><![CDATA[Bounced Email Processing]]></phrase>
-    <phrase title="option_bdMails_bounce_explain" version_id="11" version_string="0.9.4"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Amazon SES, Mandrill.]]></phrase>
+    <phrase title="option_bdMails_bounce_explain" version_id="13" version_string="0.9.5-BETA"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Amazon SES, Mailgun and Mandrill.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>

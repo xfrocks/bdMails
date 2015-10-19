@@ -226,14 +226,9 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
         if (empty($_POST['mandrill_events'])) {
             // looks like a HEAD request for verification from Mandrill
             // we can't rely on REQUEST_METHOD due to different server implementation though
-            /** @var XenForo_Model_DataRegistry $dataRegistryModel */
-            $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
-            $subscriptions = $dataRegistryModel->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
-            if (empty($subscriptions)) {
-                $subscriptions = array();
-            }
+            $subscriptions = self::_getSubscriptions();
             $subscriptions['mandrill'][$_REQUEST['md5']] = true;
-            $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+            self::_setSubscriptions($subscriptions);
 
             return false;
         }

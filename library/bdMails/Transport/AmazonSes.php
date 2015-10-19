@@ -112,14 +112,9 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 
         switch ($notification['notificationType']) {
             case 'AmazonSnsSubscriptionSucceeded':
-                /** @var XenForo_Model_DataRegistry $dataRegistryModel */
-                $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
-                $subscriptions = $dataRegistryModel->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
-                if (empty($subscriptions)) {
-                    $subscriptions = array();
-                }
+                $subscriptions = self::_getSubscriptions();
                 $subscriptions['amazonses'][$notification['message']] = true;
-                $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+                self::_setSubscriptions($subscriptions);
                 break;
             case 'Bounce':
                 if (!bdMails_Option::get('bounce')) {

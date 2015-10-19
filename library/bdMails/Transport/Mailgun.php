@@ -179,14 +179,9 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
         if ($result) {
             // because Mailgun does not send any request to test our url
             // we will have to mark it as done manually
-            /** @var XenForo_Model_DataRegistry $dataRegistryModel */
-            $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
-            $subscriptions = $dataRegistryModel->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
-            if (empty($subscriptions)) {
-                $subscriptions = array();
-            }
+            $subscriptions = self::_getSubscriptions();
             $subscriptions['mailgun'][$this->_domain] = true;
-            $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+            self::_setSubscriptions($subscriptions);
         }
 
         return $result;

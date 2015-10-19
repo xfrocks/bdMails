@@ -195,4 +195,35 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
         }
     }
 
+    protected static function _getSubscriptions()
+    {
+        $subscriptions = self::_getDataRegistryModel()->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
+        if (empty($subscriptions)) {
+            $subscriptions = array();
+        }
+
+        return $subscriptions;
+    }
+
+    protected static function _setSubscriptions(array $subscriptions)
+    {
+        self::_getDataRegistryModel()->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+
+        return true;
+    }
+
+    /**
+     * @return XenForo_Model_DataRegistry
+     */
+    protected static function _getDataRegistryModel()
+    {
+        static $model = null;
+
+        if ($model === null) {
+            $model = XenForo_Model::create('XenForo_Model_DataRegistry');
+        }
+
+        return $model;
+    }
+
 }

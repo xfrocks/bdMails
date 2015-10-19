@@ -167,13 +167,13 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
         return array($hardBounce, $softBounce);
     }
 
-    public function bdMails_postWebhooksAdd($hardBounce = false, $softBounce = false)
+    public function bdMails_postWebhooksAdd($hardBounce, $softBounce)
     {
         $events = array();
-        if ($hardBounce) {
+        if ($hardBounce === false) {
             $events[] = 'hard_bounce';
         }
-        if ($softBounce) {
+        if ($softBounce === false) {
             $events[] = 'soft_bounce';
         }
         if (empty($events)) {
@@ -206,14 +206,14 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
     public static function getWebhookUrl($domain)
     {
         if (XenForo_Application::debugMode()) {
-            $configUrl = XenForo_Application::getConfig()->get('bdMails_mandrillWebhookUrl');
+            $configUrl = XenForo_Application::getConfig()->get('bdMails_webhookUrl');
             if (!empty($configUrl)) {
                 return sprintf('%s?md5=%s', $configUrl, md5($domain));
             }
         }
 
         return sprintf('%s/bdmails/mandrill.php?md5=%s',
-            XenForo_Application::getOptions()->get('boardUrl'),
+            rtrim(XenForo_Application::getOptions()->get('boardUrl'), '/'),
             md5($domain));
     }
 

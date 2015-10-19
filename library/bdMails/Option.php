@@ -10,6 +10,8 @@ class bdMails_Option
         $amazonSesSubscriptionsRequired = false;
         $amazonSesBounceSubscribed = false;
         $amazonSesComplaintSubscribed = false;
+        $mailgunWebhookUrl = '';
+        $mailgunWebhookAdded = false;
         $mandrillWebhookUrl = '';
         $mandrillWebhookAdded = false;
 
@@ -37,6 +39,19 @@ class bdMails_Option
 
                                 if (strpos($subscriptionMessage, 'Complaint') !== false) {
                                     $amazonSesComplaintSubscribed = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 'mailgun':
+                    if (!empty($optionValue['mailgun']['domain'])) {
+                        $mailgunWebhookUrl = bdMails_Transport_Mailgun::getWebhookUrl();
+
+                        if (!empty($subscriptions['mailgun'])) {
+                            foreach ($subscriptions['mailgun'] as $domain => $received) {
+                                if ($optionValue['mailgun']['domain'] === $domain) {
+                                    $mailgunWebhookAdded = true;
                                 }
                             }
                         }
@@ -75,6 +90,8 @@ class bdMails_Option
             'amazonSesSubscriptionsRequired' => $amazonSesSubscriptionsRequired,
             'amazonSesBounceSubscribed' => $amazonSesBounceSubscribed,
             'amazonSesComplaintSubscribed' => $amazonSesComplaintSubscribed,
+            'mailgunWebhookUrl' => $mailgunWebhookUrl,
+            'mailgunWebhookAdded' => $mailgunWebhookAdded,
             'mandrillWebhookAdded' => $mandrillWebhookAdded,
             'mandrillWebhookUrl' => $mandrillWebhookUrl,
         ));

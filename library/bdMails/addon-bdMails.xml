@@ -54,7 +54,15 @@
 <div id="ctrl_optionsbdMails_providername_mailgun_Disabler">
 	<xen:controlunit label="">
 		<div class="explain">
-			<p>{xen:phrase bdmails_mailgun_explain}</p>
+			<p>
+				{xen:phrase bdmails_mailgun_explain}
+			
+				<xen:if is="{$mailgunWebhookUrl} && !{$mailgunWebhookAdded}">
+					{xen:phrase bdmails_mailgun_webhook,
+						'webhookUrl={$mailgunWebhookUrl}',
+						'link={xen:adminlink tools/mailgun/webhooks/add}'}
+				</xen:if>
+			</p>
 		</div>
 	</xen:controlunit>
 
@@ -178,6 +186,7 @@ $0]]></replace>
     <phrase title="bdmails_mailgun_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mailgun.com/" target="_blank" tabindex="-1">Mailgun</a> and verify your domain. You can read their documentation <a href="http://documentation.mailgun.com/quickstart.html" target="_blank" tabindex="-1">here</a>.]]></phrase>
     <phrase title="bdmails_mailgun_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mailgun_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires a correctly configured domain to work. You can use your own domain or Mailgun's sub-domain, consult <a href="http://documentation.mailgun.com/user_manual.html#verifying-your-domain" target="_blank">their documentation</a> for more information.]]></phrase>
+    <phrase title="bdmails_mailgun_webhook" version_id="13" version_string="0.9.5-BETA"><![CDATA[For bounce processing, you need to set a url ({webhookUrl}) as a <a href="https://documentation.mailgun.com/user_manual.html#webhooks" target="_blank" tabindex="-1">Webhook</a> that subscribes to bounce event. Or you can <a href="{link}" tabindex="-1">click here</a> to create it automatically.]]></phrase>
     <phrase title="bdmails_mandrill_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mandrillapp.com/" target="_blank" tabindex="-1">Mandrill</a> and verify your sending domain.]]></phrase>
     <phrase title="bdmails_mandrill_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mandrill_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mandrill requires a verified sending domain to work.]]></phrase>

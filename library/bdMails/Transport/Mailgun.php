@@ -2,7 +2,7 @@
 
 class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 {
-    public static $apiUrl = 'https://api.mailgun.net/v2';
+    public static $apiUrl = 'https://api.mailgun.net/v3';
 
     protected $_apiKey;
     protected $_domain;
@@ -108,4 +108,146 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
         );
     }
 
+    public function bdMails_getWebhooks()
+    {
+        $url = self::getWebhookUrl();
+
+        $client = XenForo_Helper_Http::getClient(sprintf('%s/domains/%s/webhooks', self::$apiUrl, $this->_domain));
+        $client->setAuth('api', $this->_apiKey);
+
+        $response = $client->request('GET')->getBody();
+
+        // $$event == null: existing webhook not found
+        // $$event == false: webhook exists but incorrect url
+        // $$event == true: webhook has been setup correctly
+        $bounce = null;
+
+        $responseArray = @json_decode($response, true);
+        if (!empty($responseArray['webhooks'])) {
+            foreach ($responseArray['webhooks'] as $event => $webhook) {
+                $$event = false;
+
+                if (!empty($webhook['url'])
+                    && $webhook['url'] === $url
+                ) {
+                    $$event = true;
+                }
+            }
+        }
+
+        return array($bounce);
+    }
+
+    public function bdMails_postWebhooks($bounce)
+    {
+        $events = array();
+        if (!$bounce) {
+            $events[] = 'bounce';
+        }
+
+        $url = self::getWebhookUrl();
+        $postedCount = 0;
+
+        foreach ($events as $event) {
+            if ($$event === null) {
+                $client = XenForo_Helper_Http::getClient(sprintf('%s/domains/%s/webhooks',
+                    self::$apiUrl, $this->_domain));
+                $client->setAuth('api', $this->_apiKey);
+                $client->setParameterPost(array(
+                    'id' => $event,
+                    'url' => $url,
+                ));
+                $response = $client->request('POST')->getBody();
+            } else {
+                $client = XenForo_Helper_Http::getClient(sprintf('%s/domains/%s/webhooks/%s',
+                    self::$apiUrl, $this->_domain, $event));
+                $client->setAuth('api', $this->_apiKey);
+                $client->setRawData(sprintf('url=%s', rawurlencode($url)), 'application/x-www-form-urlencoded');
+                $response = $client->request('PUT')->getBody();
+            }
+
+            $responseArray = @json_decode($response, true);
+            if (!empty($responseArray['webhook']['url'])
+                && $responseArray['webhook']['url'] === $url
+            ) {
+                $postedCount++;
+            }
+        }
+
+        $result = count($events) === $postedCount;
+
+        if ($result) {
+            // because Mailgun does not send any request to test our url
+            // we will have to mark it as done manually
+            /** @var XenForo_Model_DataRegistry $dataRegistryModel */
+            $dataRegistryModel = XenForo_Model::create('XenForo_Model_DataRegistry');
+            $subscriptions = $dataRegistryModel->get(self::DATA_REGISTRY_SUBSCRIPTIONS);
+            if (empty($subscriptions)) {
+                $subscriptions = array();
+            }
+            $subscriptions['mailgun'][$this->_domain] = true;
+            $dataRegistryModel->set(self::DATA_REGISTRY_SUBSCRIPTIONS, $subscriptions);
+        }
+
+        return $result;
+    }
+
+
+    public function bdMails_doWebhook()
+    {
+        if (empty($_POST['timestamp'])
+            || empty($_POST['token'])
+            || empty($_POST['signature'])
+            || empty($_POST['domain'])
+            || empty($_POST['event'])
+            || empty($_POST['recipient'])
+        ) {
+            return false;
+        }
+
+        if (!$this->bdMails_validateHook($_POST['timestamp'], $_POST['token'], $_POST['signature'])) {
+            XenForo_Error::logError('Invalid Mailgun webhook request detected.');
+            return false;
+        }
+
+        if ($_POST['domain'] !== $this->_domain
+            || $_POST['event'] !== 'bounced'
+        ) {
+            return false;
+        }
+
+        $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?', $_POST['recipient']);
+        if (empty($userId)) {
+            return false;
+        }
+
+        $bounceType = 'hard';
+        $bounceDate = $_POST['timestamp'];
+
+        /** @var bdMails_Model_EmailBounce $emailBounceModel */
+        $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
+        $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($_POST, array(
+            'email' => $_POST['recipient'],
+            'reason' => $_POST['error'],
+        )));
+
+        return true;
+    }
+
+    public function bdMails_validateHook($timestamp, $token, $signature)
+    {
+        return hash_hmac('sha256', $timestamp . $token, $this->_apiKey) === $signature;
+    }
+
+    public static function getWebhookUrl()
+    {
+        if (XenForo_Application::debugMode()) {
+            $configUrl = XenForo_Application::getConfig()->get('bdMails_webhookUrl');
+            if (!empty($configUrl)) {
+                return $configUrl;
+            }
+        }
+
+        return sprintf('%s/bdmails/mailgun.php', rtrim(XenForo_Application::getOptions()->get('boardUrl'), '/'));
+    }
 }

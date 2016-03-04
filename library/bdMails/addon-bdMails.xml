@@ -4,6 +4,16 @@
   <admin_permissions/>
   <admin_style_properties/>
   <admin_templates>
+    <template title="bdmails_option_amazonses_statistics"><![CDATA[{xen:number $statistics.deliveryAttempts}<xen:if is="{$statistics.complaints}">;
+{xen:phrase bdmails_amazonses_statistics_delivery_complaints}:
+{xen:number $statistics.complaints} ({xen:number {xen:calc
+'{$statistics.complaints} / {$statistics.deliveryAttempts} * 100'}, 1}%)</xen:if><xen:if is="{$statistics.rejects}">;
+{xen:phrase bdmails_amazonses_statistics_delivery_rejects}:
+{xen:number $statistics.rejects} ({xen:number {xen:calc
+'{$statistics.rejects} / {$statistics.deliveryAttempts} * 100'}, 1}%)</xen:if><xen:if is="{$statistics.bounces}">;
+{xen:phrase bdmails_amazonses_statistics_delivery_bounces}:
+{xen:number $statistics.bounces} ({xen:number {xen:calc
+'{$statistics.bounces} / {$statistics.deliveryAttempts} * 100'}, 1}%)</xen:if>]]></template>
     <template title="bdmails_option_providers"><![CDATA[<xen:controlunit label="{$preparedOption.title}" explain="{xen:raw $preparedOption.explain}">
 	<xen:radio name="{$fieldPrefix}[{$preparedOption.option_id}][name]" value="{$value.name}">
 		<xen:option value="">{xen:phrase default}</xen:option>
@@ -36,6 +46,62 @@
 							</xen:if>
 						</xen:contentcheck>
 					</xen:if>
+				</xen:if>
+				
+				<xen:if hascontent="true">
+					<div class="baseHtml">
+						{xen:phrase bdmails_amazonses_quota}:
+						<ul>
+							<xen:contentcheck>
+							<xen:if is="{$amazonSesInfo.quota.Max24HourSend}">
+							<li>{xen:phrase bdmails_amazonses_quota_max24hoursend}: 
+								{xen:number $amazonSesInfo.quota.Max24HourSend}</li>
+							</xen:if>
+							<xen:if is="{$amazonSesInfo.quota.SentLast24Hours}">
+							<li>
+								{xen:phrase bdmails_amazonses_quota_sentlast24hours}: 
+								{xen:number $amazonSesInfo.quota.SentLast24Hours}
+								<xen:if is="{$amazonSesInfo.quota.Max24HourSend} > 0">
+								({xen:number {xen:calc '{$amazonSesInfo.quota.SentLast24Hours}
+									/ {$amazonSesInfo.quota.Max24HourSend} * 100'}, 1}%)
+								</xen:if>
+							</li>
+							</xen:if>
+							<xen:if is="{$amazonSesInfo.quota.MaxSendRate}">
+							<li>{xen:phrase bdmails_amazonses_quota_maxsendrate}: 
+								{xen:number $amazonSesInfo.quota.MaxSendRate, 1}</li>
+							</xen:if>
+							</xen:contentcheck>
+						</ul>
+					</div>
+				</xen:if>
+
+				<xen:if hascontent="true">
+					<div class="baseHtml">
+						{xen:phrase bdmails_amazonses_statistics}:
+						<ul>
+							<xen:contentcheck>
+							<xen:if is="{$amazonSesInfo.statistics.last_hour}">
+							<li>{xen:phrase bdmails_amazonses_statistics_delivery_attempts_last_hour}:
+								<xen:include template="bdmails_option_amazonses_statistics">
+								<xen:map from="$amazonSesInfo.statistics.last_hour" to="$statistics" />
+								</xen:include></li>
+							</xen:if>
+							<xen:if is="{$amazonSesInfo.statistics.last_day}">
+							<li>{xen:phrase bdmails_amazonses_statistics_delivery_attempts_last_day}:
+								<xen:include template="bdmails_option_amazonses_statistics">
+								<xen:map from="$amazonSesInfo.statistics.last_day" to="$statistics" />
+								</xen:include></li>
+							</xen:if>
+							<xen:if is="{$amazonSesInfo.statistics.last_week}">
+							<li>{xen:phrase bdmails_amazonses_statistics_delivery_attempts_last_week}:
+								<xen:include template="bdmails_option_amazonses_statistics">
+								<xen:map from="$amazonSesInfo.statistics.last_week" to="$statistics" />
+								</xen:include></li>
+							</xen:if>
+							</xen:contentcheck>
+						</ul>
+					</div>
 				</xen:if>
 			</p>
 		</div>
@@ -177,6 +243,10 @@ $0]]></replace>
   <phrases>
     <phrase title="bdmails_access_key" version_id="11" version_string="0.9.4"><![CDATA[Access Key ID]]></phrase>
     <phrase title="bdmails_amazonses_explain" version_id="11" version_string="0.9.4"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://console.aws.amazon.com/ses/home" target="_blank" tabindex="-1">Amazon AWS Console</a> and have your domain verified.]]></phrase>
+    <phrase title="bdmails_amazonses_quota" version_id="14" version_string="1.0.0"><![CDATA[Send Quota]]></phrase>
+    <phrase title="bdmails_amazonses_quota_max24hoursend" version_id="14" version_string="1.0.0"><![CDATA[Emails per 24 hour period]]></phrase>
+    <phrase title="bdmails_amazonses_quota_maxsendrate" version_id="14" version_string="1.0.0"><![CDATA[Max Send Rate]]></phrase>
+    <phrase title="bdmails_amazonses_quota_sentlast24hours" version_id="14" version_string="1.0.0"><![CDATA[Emails Sent (this period)]]></phrase>
     <phrase title="bdmails_amazonses_requires_access_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires an access key ID to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_domain" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a verified domain to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_private_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a secret access key to work.]]></phrase>
@@ -187,6 +257,13 @@ $0]]></replace>
     <phrase title="bdmails_amazonses_sns_missing_both" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: red">According to system records, SNS hasn't been setup.</span>]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_bounce" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Complaint has been setup correctly but Bounce has not.</span>]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_complaint" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Bounce has been setup correctly but Complaint has not.</span>]]></phrase>
+    <phrase title="bdmails_amazonses_statistics" version_id="14" version_string="1.0.0"><![CDATA[Statistics]]></phrase>
+    <phrase title="bdmails_amazonses_statistics_delivery_attempts_last_day" version_id="14" version_string="1.0.0"><![CDATA[Last Day]]></phrase>
+    <phrase title="bdmails_amazonses_statistics_delivery_attempts_last_hour" version_id="14" version_string="1.0.0"><![CDATA[Last Hour]]></phrase>
+    <phrase title="bdmails_amazonses_statistics_delivery_attempts_last_week" version_id="14" version_string="1.0.0"><![CDATA[Last Week]]></phrase>
+    <phrase title="bdmails_amazonses_statistics_delivery_bounces" version_id="14" version_string="1.0.0"><![CDATA[Bounces]]></phrase>
+    <phrase title="bdmails_amazonses_statistics_delivery_complaints" version_id="14" version_string="1.0.0"><![CDATA[Complaints]]></phrase>
+    <phrase title="bdmails_amazonses_statistics_delivery_rejects" version_id="14" version_string="1.0.0"><![CDATA[Rejects]]></phrase>
     <phrase title="bdmails_amazon_region" version_id="11" version_string="0.9.4"><![CDATA[Region]]></phrase>
     <phrase title="bdmails_api_key" version_id="1" version_string="0.9-dev"><![CDATA[API Key]]></phrase>
     <phrase title="bdmails_domain" version_id="1" version_string="0.9-dev"><![CDATA[Domain]]></phrase>

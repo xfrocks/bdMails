@@ -2,9 +2,7 @@
 
 class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 {
-    public static $apiUrl = 'https://email.%s.amazonaws.com';
-
-    protected $_apiUrl;
+    protected $_region;
     protected $_accessKey;
     protected $_privateKey;
     protected $_domain;
@@ -13,7 +11,7 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
     {
         parent::__construct($options);
 
-        $this->_apiUrl = sprintf(self::$apiUrl, $region);
+        $this->_region = $region;
         $this->_accessKey = $accessKey;
         $this->_privateKey = $privateKey;
         $this->_domain = $domain;
@@ -32,6 +30,16 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
         }
         $validatedFrom = $this->bdMails_validateFromEmail($from);
         $this->_headers['From'] = array($validatedFrom, 'append' => true);
+
+        if (isset($this->_headers['Return-Path'])) {
+            if (count($this->_headers['Return-Path']) == 1
+                && isset($this->_headers['Return-Path'][0])
+            ) {
+                $this->_headers['Return-Path'][0] = $this->bdMails_validateFromEmail($this->_headers['Return-Path'][0]);
+            } else {
+                unset($this->_headers['Return-Path']);
+            }
+        }
     }
 
     public function bdMails_validateFromEmail($fromEmail)
@@ -41,39 +49,19 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 
     protected function _bdMails_sendMail()
     {
-        $client = XenForo_Helper_Http::getClient($this->_apiUrl);
+        $messageData = sprintf("%s\n%s\n", $this->header, $this->body);
 
-        $date = gmdate('D, d M Y H:i:s O');
-        $client->setHeaders('Date', $date);
-        $client->setHeaders('X-Amzn-Authorization', $this->_bdMails_getAuthorizationHeader($date));
-
-        $request['Action'] = 'SendRawEmail';
-        $request['RawMessage.Data'] = base64_encode(sprintf("%s\n%s\n", $this->header, $this->body));
-
-        $client->setEncType(Zend_Http_Client::ENC_URLENCODED);
-        $client->setParameterPost($request);
-
-        $response = $client->request('POST');
-        $responseBody = $response->getBody();
-
-        $success = false;
-        if ($response->getStatus() == 200) {
-            $success = true;
-        }
+        $sent = bdMails_Helper_AmazonSes::sendRawEmail(
+            $this->_region,
+            $this->_accessKey,
+            $this->_privateKey,
+            base64_encode($messageData)
+        );
 
         return array(
-            $request,
-            $responseBody,
-            $success,
-        );
-    }
-
-    protected function _bdMails_getAuthorizationHeader($date)
-    {
-        return sprintf(
-            'AWS3-HTTPS AWSAccessKeyId=%s,Algorithm=HmacSHA256,Signature=%s',
-            $this->_accessKey,
-            base64_encode(hash_hmac('sha256', $date, $this->_privateKey, TRUE))
+            $messageData,
+            $sent['body'],
+            $sent['status'] == 200,
         );
     }
 

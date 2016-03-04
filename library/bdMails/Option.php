@@ -7,6 +7,7 @@ class bdMails_Option
     public static function renderProviders(XenForo_View $view, $fieldPrefix, array $preparedOption, $canEdit)
     {
         $optionValue = $preparedOption['option_value'];
+        $amazonSesInfo = array();
         $amazonSesSubscriptionsRequired = false;
         $amazonSesBounceSubscribed = false;
         $amazonSesComplaintSubscribed = false;
@@ -14,6 +15,28 @@ class bdMails_Option
         $mailgunWebhookAdded = false;
         $mandrillWebhookUrl = '';
         $mandrillWebhookAdded = false;
+
+        if (!empty($optionValue['name'])) {
+            switch ($optionValue['name']) {
+                case 'amazonses':
+                    if (!empty($optionValue['amazonses']['region'])
+                        && !empty($optionValue['amazonses']['access_key'])
+                        && !empty($optionValue['amazonses']['private_key'])
+                    ) {
+                        $amazonSesInfo['quota'] = bdMails_Helper_AmazonSes::getSendQuota(
+                            $optionValue['amazonses']['region'],
+                            $optionValue['amazonses']['access_key'],
+                            $optionValue['amazonses']['private_key']
+                        );
+                        $amazonSesInfo['statistics'] = bdMails_Helper_AmazonSes::getSendStatistics(
+                            $optionValue['amazonses']['region'],
+                            $optionValue['amazonses']['access_key'],
+                            $optionValue['amazonses']['private_key']
+                        );
+                    }
+                    break;
+            }
+        }
 
         if (bdMails_Option::get('bounce')
             && !empty($optionValue['name'])
@@ -87,6 +110,7 @@ class bdMails_Option
             'formatParams' => $preparedOption['formatParams'],
             'editLink' => $editLink,
 
+            'amazonSesInfo' => $amazonSesInfo,
             'amazonSesSubscriptionsRequired' => $amazonSesSubscriptionsRequired,
             'amazonSesBounceSubscribed' => $amazonSesBounceSubscribed,
             'amazonSesComplaintSubscribed' => $amazonSesComplaintSubscribed,

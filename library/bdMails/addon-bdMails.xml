@@ -49,6 +49,13 @@
 	<xen:textboxunit label="{xen:phrase bdmails_access_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][access_key]" value="{$value.amazonses.access_key}" />
 	<xen:textboxunit label="{xen:phrase bdmails_private_key}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][private_key]" value="{$value.amazonses.private_key}" />
 	<xen:textboxunit label="{xen:phrase bdmails_domain}" name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][domain]" value="{$value.amazonses.domain}" />
+	<xen:checkboxunit label="" explain="{xen:phrase bdmails_amazonses_sendmail_explain}">
+		<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][amazonses][sendmail]"
+					value="1"
+					selected="{$value.amazonses.sendmail}">
+			{xen:phrase bdmails_amazonses_sendmail}
+		</xen:option>
+	</xen:checkboxunit>
 </div>
 
 <div id="ctrl_optionsbdMails_providername_mailgun_Disabler">
@@ -174,6 +181,8 @@ $0]]></replace>
     <phrase title="bdmails_amazonses_requires_domain" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a verified domain to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_private_key" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a secret access key to work.]]></phrase>
     <phrase title="bdmails_amazonses_requires_region" version_id="11" version_string="0.9.4"><![CDATA[Provider Amazon SES requires a valid region to work.]]></phrase>
+    <phrase title="bdmails_amazonses_sendmail" version_id="14" version_string="1.0.0"><![CDATA[Use sendmail]]></phrase>
+    <phrase title="bdmails_amazonses_sendmail_explain" version_id="14" version_string="1.0.0"><![CDATA[Enable this option use sendmail binary to deliver mails. You will need to configure postfix or similar to have them relay to Amazon SES, <a href="http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sendmail.html" target="_blank" tabindex="-1">documentation is available here</a>.]]></phrase>
     <phrase title="bdmails_amazonses_sns" version_id="13" version_string="0.9.5-BETA"><![CDATA[For bounce processing, you need to create a <a href="https://console.aws.amazon.com/sns/v2/home" target="_blank" tabindex="-1">Amazon SNS</a> Topic, subscribe with HTTP endpoint "{boardUrl}/bdmails/amazon.php" then turn on both bounce and complaint notifications for your domain.]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_both" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: red">According to system records, SNS hasn't been setup.</span>]]></phrase>
     <phrase title="bdmails_amazonses_sns_missing_bounce" version_id="11" version_string="0.9.4"><![CDATA[<span style="color: orange">According to system records, SNS for Complaint has been setup correctly but Bounce has not.</span>]]></phrase>

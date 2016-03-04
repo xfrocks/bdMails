@@ -46,6 +46,10 @@ class bdMails_Helper_Transport
                     throw new XenForo_Exception(new XenForo_Phrase('bdmails_amazonses_requires_domain'), true);
                 }
 
+                if (!empty($config['sendmail'])) {
+                    return new Zend_Mail_Transport_Sendmail();
+                }
+
                 $transport = new bdMails_Transport_AmazonSes(
                     $config['region'],
                     $config['access_key'],

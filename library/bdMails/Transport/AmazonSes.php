@@ -109,6 +109,19 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                     return false;
                 }
 
+                $bounceType = '';
+                switch ($notification['bounce']['bounceType']) {
+                    case 'Permanent':
+                        $bounceType = 'hard';
+                        break;
+                    case 'Transient':
+                        $bounceType = 'soft';
+                        break;
+                }
+                if (empty($bounceType)) {
+                    return false;
+                }
+
                 foreach ($notification['bounce']['bouncedRecipients'] as $recipient) {
                     $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?',
                         $recipient['emailAddress']);
@@ -116,7 +129,6 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                         continue;
                     }
 
-                    $bounceType = ($notification['bounce']['bounceType'] == 'Permanent' ? 'hard' : 'soft');
                     $bounceDate = strtotime($notification['bounce']['timestamp']);
 
                     /** @var bdMails_Model_EmailBounce $emailBounceModel */

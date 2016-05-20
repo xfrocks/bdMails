@@ -2,6 +2,8 @@
 
 class bdMails_Listener
 {
+    const UPDATER_URL = 'https://xfrocks.com/api/index.php?updater';
+
     public static function load_class_XenForo_ControllerAdmin_Tools($class, array &$extend)
     {
         if ($class === 'XenForo_ControllerAdmin_Tools') {
@@ -42,7 +44,7 @@ class bdMails_Listener
             'get'
         );
 
-        bdMails_ShippableHelper_Updater::onInitDependencies($dependencies, bdMails_Option::UPDATER_URL);
+        bdMails_ShippableHelper_Updater::onInitDependencies($dependencies, self::UPDATER_URL);
     }
 
     public static function visitor_setup(XenForo_Visitor &$visitor)

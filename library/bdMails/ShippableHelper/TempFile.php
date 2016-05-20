@@ -1,6 +1,6 @@
 <?php
 
-// updated by DevHelper_Helper_ShippableHelper at 2016-03-04T08:11:58+00:00
+// updated by DevHelper_Helper_ShippableHelper at 2016-05-20T08:10:20+00:00
 
 /**
  * Class bdMails_ShippableHelper_TempFile

@@ -19,13 +19,23 @@ class bdMails_Listener
     public static function load_class_XenForo_Mail($class, array &$extend)
     {
         if ($class === 'XenForo_Mail') {
-            $extend[] = 'bdMails_XenForo_Mail';
+            bdMails_Helper_Transport::setupTransport();
+        }
+    }
+
+    public static function load_class_XenForo_Model_MailQueue($class, array &$extend)
+    {
+        if ($class === 'XenForo_Model_MailQueue') {
+            bdMails_Helper_Transport::setupTransport();
         }
     }
 
     public static function init_dependencies(XenForo_Dependencies_Abstract $dependencies, array $data)
     {
-        bdMails_Helper_Transport::setupTransport();
+        if (!is_array($data['routesAdmin'])) {
+            // always setup transports for admin.php
+            bdMails_Helper_Transport::setupTransport();
+        }
 
         XenForo_Template_Helper_Core::$helperCallbacks['bdmails_getoption'] = array(
             'bdMails_Option',

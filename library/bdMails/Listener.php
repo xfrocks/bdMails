@@ -34,7 +34,7 @@ class bdMails_Listener
 
     public static function init_dependencies(XenForo_Dependencies_Abstract $dependencies, array $data)
     {
-        if (!is_array($data['routesAdmin'])) {
+        if (!empty($data['routesAdmin'])) {
             // always setup transports for admin.php
             bdMails_Helper_Transport::setupTransport();
         }

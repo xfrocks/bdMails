@@ -59,6 +59,7 @@ class bdMails_Model_EmailBounce extends XenForo_Model
      */
     protected function _getXenForoModel()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getModelFromCache('XenForo_Model_EmailBounce');
     }
 }

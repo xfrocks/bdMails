@@ -212,9 +212,11 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
             }
         }
 
-        return sprintf('%s/bdmails/mandrill.php?md5=%s',
+        return sprintf(
+            '%s/bdmails/mandrill.php?md5=%s',
             rtrim(XenForo_Application::getOptions()->get('boardUrl'), '/'),
-            md5($domain));
+            md5($domain)
+        );
     }
 
     public static function doWebhook()
@@ -250,8 +252,10 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
                     }
                     $msgRef =& $event['msg'];
 
-                    $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?',
-                        $msgRef['email']);
+                    $userId = XenForo_Application::getDb()->fetchOne(
+                        'SELECT user_id FROM xf_user WHERE email = ?',
+                        $msgRef['email']
+                    );
                     if (empty($userId)) {
                         continue;
                     }

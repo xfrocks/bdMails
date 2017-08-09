@@ -24,7 +24,7 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
         return $fromEmail;
     }
 
-    protected final function _sendMail()
+    final protected function _sendMail()
     {
         $startTime = microtime(true);
 
@@ -41,10 +41,16 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
             return;
         }
 
-        $logPath = sprintf('%s/bdmails_%d_%s.log', XenForo_Helper_File::getInternalDataPath(), XenForo_Application::$time, md5(serialize($request)));
+        $logPath = sprintf(
+            '%s/bdmails_%d_%s.log',
+            XenForo_Helper_File::getInternalDataPath(),
+            XenForo_Application::$time,
+            md5(serialize($request))
+        );
 
         if (!$success) {
-            XenForo_Error::logException(new XenForo_Exception(sprintf('Sending mail failed, log is available at %s', $logPath)), false, '[bd] Mails: ');
+            $e = new XenForo_Exception(sprintf('Sending mail failed, log is available at %s', $logPath));
+            XenForo_Error::logException($e, false, '[bd] Mails: ');
         }
 
         file_put_contents($logPath, var_export(array(
@@ -57,9 +63,10 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 
     protected function _bdMails_decodeEncodedHeader($headerValue)
     {
+        $pattern = '#^[^=]*=\?[^\?]+\?(?<mo' . 'de>B|Q)\?(?<en' . 'coded>[^\?]+)\?=#';
         $parts = array();
         while (true) {
-            if (preg_match('#^[^=]*=\?[^\?]+\?(?<mode>B|Q)\?(?<encoded>[^\?]+)\?=#', $headerValue, $matches)) {
+            if (preg_match($pattern, $headerValue, $matches)) {
                 if ($matches['mode'] == 'Q') {
                     // quoted printable
                     $str = $matches['encoded'];
@@ -217,6 +224,7 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
      */
     protected static function _getDataRegistryModel()
     {
+        /** @var XenForo_Model_DataRegistry $model */
         static $model = null;
 
         if ($model === null) {
@@ -225,5 +233,4 @@ abstract class bdMails_Transport_Abstract extends Zend_Mail_Transport_Abstract
 
         return $model;
     }
-
 }

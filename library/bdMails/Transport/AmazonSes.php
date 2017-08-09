@@ -85,8 +85,6 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
             case 'Notification':
                 if (empty($json['Message'])) {
                     return false;
-                } else {
-                    // good, continue
                 }
                 break;
             default:
@@ -123,8 +121,10 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                 }
 
                 foreach ($notification['bounce']['bouncedRecipients'] as $recipient) {
-                    $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?',
-                        $recipient['emailAddress']);
+                    $userId = XenForo_Application::getDb()->fetchOne(
+                        'SELECT user_id FROM xf_user WHERE email = ?',
+                        $recipient['emailAddress']
+                    );
                     if (empty($userId)) {
                         continue;
                     }
@@ -133,12 +133,16 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 
                     /** @var bdMails_Model_EmailBounce $emailBounceModel */
                     $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
-                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate,
+                    $emailBounceModel->takeBounceAction(
+                        $userId,
+                        $bounceType,
+                        $bounceDate,
                         array_merge($notification['bounce'], array(
                             'email' => $recipient['emailAddress'],
                             'reason' => isset($recipient['diagnosticCode']) ? $recipient['diagnosticCode'] : 'N/A',
                             'reason_code' => isset($recipient['status']) ? $recipient['status'] : 'N/A',
-                        )));
+                        ))
+                    );
                 }
                 break;
             case 'Complaint':
@@ -147,8 +151,10 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                 }
 
                 foreach ($notification['complaint']['complainedRecipients'] as $recipient) {
-                    $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?',
-                        $recipient['emailAddress']);
+                    $userId = XenForo_Application::getDb()->fetchOne(
+                        'SELECT user_id FROM xf_user WHERE email = ?',
+                        $recipient['emailAddress']
+                    );
                     if (empty($userId)) {
                         continue;
                     }
@@ -158,11 +164,15 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
 
                     /** @var bdMails_Model_EmailBounce $emailBounceModel */
                     $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
-                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate,
+                    $emailBounceModel->takeBounceAction(
+                        $userId,
+                        $bounceType,
+                        $bounceDate,
                         array_merge($notification['complaint'], array(
                             'email' => $recipient['emailAddress'],
                             'reason' => 'complaint',
-                        )));
+                        ))
+                    );
                 }
                 break;
         }

@@ -77,5 +77,4 @@ class bdMails_Installer
 
         bdMails_ShippableHelper_Updater::onUninstall(bdMails_Listener::UPDATER_URL);
     }
-
 }

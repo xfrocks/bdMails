@@ -27,7 +27,10 @@ class bdMails_XenForo_DataWriter_User extends XFCP_bdMails_XenForo_DataWriter_Us
                     if ($this->getOption(XenForo_DataWriter_User::OPTION_ADMIN_EDIT)) {
                         // a staff member is changing the email, accept it
                     } else {
-                        throw new XenForo_Exception(new XenForo_Phrase('bdmails_must_use_different_email_address'), true);
+                        throw new XenForo_Exception(
+                            new XenForo_Phrase('bdmails_must_use_different_email_address'),
+                            true
+                        );
                     }
                 }
 
@@ -37,5 +40,4 @@ class bdMails_XenForo_DataWriter_User extends XFCP_bdMails_XenForo_DataWriter_Us
 
         parent::_preSave();
     }
-
 }

@@ -100,7 +100,7 @@ class bdMails_Helper_AmazonSes
                          'bounces',
                          'deliveryAttempts',
                      ) as $key) {
-                    $cutoffStatistics[$key] = 0;
+                $cutoffStatistics[$key] = 0;
                 foreach ($$key as $timestamp => $value) {
                     if ($timestamp > $cutoff) {
                         $cutoffStatistics[$key] += $value;
@@ -133,9 +133,14 @@ class bdMails_Helper_AmazonSes
         $responseBody = $response->getBody();
 
         if (XenForo_Application::debugMode()) {
-            XenForo_Helper_File::log(__METHOD__, sprintf("POST %s (action=%s; %s)\n\t->%d %s",
-                $uri, $action, implode(', ', array_keys($params)),
-                $responseStatus, $responseBody));
+            XenForo_Helper_File::log(__METHOD__, sprintf(
+                "POST %s (action=%s; %s)\n\t->%d %s",
+                $uri,
+                $action,
+                implode(', ', array_keys($params)),
+                $responseStatus,
+                $responseBody
+            ));
         }
 
         return array(

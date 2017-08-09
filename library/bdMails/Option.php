@@ -149,5 +149,4 @@ class bdMails_Option
 
         return $options->get('bdMails_' . $optionName, $subOption);
     }
-
 }

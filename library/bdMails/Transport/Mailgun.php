@@ -4,7 +4,14 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 {
     public static $apiUrl = 'https://api.mailgun.net/v3';
 
+    /**
+     * @var string
+     */
     protected $_apiKey;
+
+    /**
+     * @var string
+     */
     protected $_domain;
 
     public function __construct($apiKey, $domain, $options = array())
@@ -150,8 +157,11 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
 
         foreach ($events as $event) {
             if ($$event === null) {
-                $client = XenForo_Helper_Http::getClient(sprintf('%s/domains/%s/webhooks',
-                    self::$apiUrl, $this->_domain));
+                $client = XenForo_Helper_Http::getClient(sprintf(
+                    '%s/domains/%s/webhooks',
+                    self::$apiUrl,
+                    $this->_domain
+                ));
                 $client->setAuth('api', $this->_apiKey);
                 $client->setParameterPost(array(
                     'id' => $event,
@@ -159,8 +169,12 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
                 ));
                 $response = $client->request('POST')->getBody();
             } else {
-                $client = XenForo_Helper_Http::getClient(sprintf('%s/domains/%s/webhooks/%s',
-                    self::$apiUrl, $this->_domain, $event));
+                $client = XenForo_Helper_Http::getClient(sprintf(
+                    '%s/domains/%s/webhooks/%s',
+                    self::$apiUrl,
+                    $this->_domain,
+                    $event
+                ));
                 $client->setAuth('api', $this->_apiKey);
                 $client->setRawData(sprintf('url=%s', rawurlencode($url)), 'application/x-www-form-urlencoded');
                 $response = $client->request('PUT')->getBody();
@@ -211,7 +225,10 @@ class bdMails_Transport_Mailgun extends bdMails_Transport_Abstract
             return false;
         }
 
-        $userId = XenForo_Application::getDb()->fetchOne('SELECT user_id FROM xf_user WHERE email = ?', $_POST['recipient']);
+        $userId = XenForo_Application::getDb()->fetchOne(
+            'SELECT user_id FROM xf_user WHERE email = ?',
+            $_POST['recipient']
+        );
         if (empty($userId)) {
             return false;
         }

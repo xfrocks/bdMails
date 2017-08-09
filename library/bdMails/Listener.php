@@ -64,8 +64,12 @@ class bdMails_Listener
         $visitor['_bdMails_bounced'] = $bouncedArray;
     }
 
-    public static function front_controller_pre_view(XenForo_FrontController $fc, XenForo_ControllerResponse_Abstract &$controllerResponse, XenForo_ViewRenderer_Abstract &$viewRenderer, array &$containerParams)
-    {
+    public static function front_controller_pre_view(
+        XenForo_FrontController $fc,
+        XenForo_ControllerResponse_Abstract &$controllerResponse,
+        XenForo_ViewRenderer_Abstract &$viewRenderer,
+        array &$containerParams
+    ) {
         $visitor = XenForo_Visitor::getInstance();
 
         if ($visitor->get('user_state') == 'email_confirm_edit'
@@ -90,5 +94,4 @@ class bdMails_Listener
     {
         $hashes += bdMails_FileSums::getHashes();
     }
-
 }

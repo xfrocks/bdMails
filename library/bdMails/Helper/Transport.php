@@ -82,7 +82,10 @@ class bdMails_Helper_Transport
                 break;
             case 'sendgrid':
                 if (empty($config['username']) OR empty($config['password'])) {
-                    throw new XenForo_Exception(new XenForo_Phrase('bdmails_sendgrid_requires_username_and_password'), true);
+                    throw new XenForo_Exception(
+                        new XenForo_Phrase('bdmails_sendgrid_requires_username_and_password'),
+                        true
+                    );
                 }
 
                 if (empty($config['domain'])) {
@@ -91,11 +94,15 @@ class bdMails_Helper_Transport
                     $domain = $config['domain'];
                 }
 
-                $transport = new bdMails_Transport_SendGrid($config['username'], $config['password'], $domain, $options);
+                $transport = new bdMails_Transport_SendGrid(
+                    $config['username'],
+                    $config['password'],
+                    $domain,
+                    $options
+                );
                 break;
         }
 
         return $transport;
     }
-
 }

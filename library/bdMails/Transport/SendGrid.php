@@ -135,5 +135,4 @@ class bdMails_Transport_SendGrid extends bdMails_Transport_Abstract
             $success,
         );
     }
-
 }

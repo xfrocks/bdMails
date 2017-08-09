@@ -44,7 +44,9 @@ class bdMails_Listener
             'get'
         );
 
-        bdMails_ShippableHelper_Updater::onInitDependencies($dependencies, self::UPDATER_URL);
+        if (isset($data['routesAdmin'])) {
+            bdMails_ShippableHelper_Updater::onInitDependencies($dependencies, self::UPDATER_URL);
+        }
     }
 
     public static function visitor_setup(XenForo_Visitor &$visitor)

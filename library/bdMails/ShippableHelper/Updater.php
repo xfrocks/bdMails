@@ -1,10 +1,10 @@
 <?php
 
-// updated by DevHelper_Helper_ShippableHelper at 2016-05-25T09:07:34+00:00
+// updated by DevHelper_Helper_ShippableHelper at 2017-08-09T08:02:30+00:00
 
 /**
  * Class bdMails_ShippableHelper_Updater
- * @version 6
+ * @version 7
  * @see DevHelper_Helper_ShippableHelper_Updater
  */
 class bdMails_ShippableHelper_Updater
@@ -18,6 +18,9 @@ class bdMails_ShippableHelper_Updater
      * Verifies config to make sure the Updater should run.
      * 1. It has not been configured yet
      * 2. Or it has been enabled at some point
+     *
+     * Tips:
+     * 1. Wrap this call within a `if (isset($data['routesAdmin'])) { ... }` for small performance boost
      *
      * @param XenForo_Dependencies_Abstract $dependencies
      * @param string|null $apiUrl
@@ -46,7 +49,7 @@ class bdMails_ShippableHelper_Updater
             $apiUrl = self::API_URL;
         }
 
-        if (!Zend_Uri::check($apiUrl)) {
+        if (!parse_url($apiUrl, PHP_URL_HOST)) {
             throw new XenForo_Exception(sprintf('$apiUrl is invalid: %s', $apiUrl));
         }
 

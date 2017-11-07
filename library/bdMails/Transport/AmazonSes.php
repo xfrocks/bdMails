@@ -121,6 +121,13 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                 }
 
                 foreach ($notification['bounce']['bouncedRecipients'] as $recipient) {
+                    if (empty($recipient['status']) && empty($recipient['diagnosticCode'])) {
+                        // ignore bounce notification without both status AND diagnostic code
+                        // in practice, we found those to be incorrect
+                        XenForo_Error::logException(new Exception(json_encode($recipient), false, 'Amazon SES: '));
+                        continue;
+                    }
+
                     $userId = XenForo_Application::getDb()->fetchOne(
                         'SELECT user_id FROM xf_user WHERE email = ?',
                         $recipient['emailAddress']

@@ -229,6 +229,12 @@ $0]]></replace>
       <sub_options></sub_options>
       <relation group_id="bdMails" display_order="1000"/>
     </option>
+    <option option_id="bdMails_hardenRegistration" edit_format="onoff" data_type="unsigned_integer" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="bdMails" display_order="2000"/>
+    </option>
     <option option_id="bdMails_provider" edit_format="callback" data_type="array" can_backup="1" validation_class="bdMails_Option" validation_method="verifyProvider">
       <default_value></default_value>
       <edit_format_params>bdMails_Option::renderProviders</edit_format_params>
@@ -270,6 +276,7 @@ $0]]></replace>
     <phrase title="bdmails_domain" version_id="1" version_string="0.9-dev"><![CDATA[Domain]]></phrase>
     <phrase title="bdmails_emailTransport_option_additional_explain" version_id="1" version_string="0.9-dev"><![CDATA[Other email transports are available at <a href="{options_link}" tabindex="-1">[bd] Mails options page</a>.]]></phrase>
     <phrase title="bdmails_emailTransport_option_removed_choices_explain" version_id="1" version_string="0.9-dev"><![CDATA[A custom email transport provider has been setup for [bd] Mails add-on, in order to use default transports (sendmail or SMTP), you need to turn off the provider at <a href="{options_link}" tabindex="-1">[bd] Mails options page</a>.]]></phrase>
+    <phrase title="bdmails_email_address_you_entered_blacklisted" version_id="1000200" version_string="1.0.2"><![CDATA[The email address you entered has been blacklisted. Please try another.]]></phrase>
     <phrase title="bdmails_mailgun_explain" version_id="1" version_string="0.9-dev"><![CDATA[In order to send emails via this provider, you need to register for an account at <a href="https://mailgun.com/" target="_blank" tabindex="-1">Mailgun</a> and verify your domain. You can read their documentation <a href="http://documentation.mailgun.com/quickstart.html" target="_blank" tabindex="-1">here</a>.]]></phrase>
     <phrase title="bdmails_mailgun_requires_api_key" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires an API Key to work.]]></phrase>
     <phrase title="bdmails_mailgun_requires_domain" version_id="1" version_string="0.9-dev"><![CDATA[Provider Mailgun requires a correctly configured domain to work. You can use your own domain or Mailgun's sub-domain, consult <a href="http://documentation.mailgun.com/user_manual.html#verifying-your-domain" target="_blank">their documentation</a> for more information.]]></phrase>
@@ -287,6 +294,8 @@ $0]]></replace>
     <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
     <phrase title="option_bdMails_bounce" version_id="10" version_string="0.9.4"><![CDATA[Bounced Email Processing]]></phrase>
     <phrase title="option_bdMails_bounce_explain" version_id="13" version_string="0.9.5-BETA"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Amazon SES, Mailgun and Mandrill.]]></phrase>
+    <phrase title="option_bdMails_hardenRegistration" version_id="1000200" version_string="1.0.2"><![CDATA[Hardened Registration]]></phrase>
+    <phrase title="option_bdMails_hardenRegistration_explain" version_id="1000200" version_string="1.0.2"><![CDATA[Enable this option to harden the registration flow with SFS. User won't be able to register if his/her email address is blacklisted by SFS.]]></phrase>
     <phrase title="option_bdMails_provider" version_id="1" version_string="0.9-dev"><![CDATA[Provider]]></phrase>
     <phrase title="option_bdMails_provider_explain" version_id="1" version_string="0.9-dev"><![CDATA[]]></phrase>
     <phrase title="option_group_bdMails" version_id="1" version_string="0.9-dev"><![CDATA[[bd] Mails]]></phrase>

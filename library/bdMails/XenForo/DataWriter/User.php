@@ -40,4 +40,26 @@ class bdMails_XenForo_DataWriter_User extends XFCP_bdMails_XenForo_DataWriter_Us
 
         parent::_preSave();
     }
+
+    protected function _verifyEmail(&$email)
+    {
+        $verified = parent::_verifyEmail($email);
+
+        if ($verified &&
+            $this->isInsert() &&
+            !$this->getOption(self::OPTION_ADMIN_EDIT) &&
+            bdMails_Option::get('hardenRegistration')
+        ) {
+            /** @var bdMails_Model_SpamPrevention $spamModel */
+            $spamModel = $this->getModelFromCache('bdMails_Model_SpamPrevention');
+            $request = XenForo_Application::getFc()->getRequest();
+            $spamModel->checkSfsResult(['email' => $email], $request);
+            if ($spamModel->isEmailBlacklistedInLastCheck()) {
+                $this->error(new XenForo_Phrase('bdmails_email_address_you_entered_blacklisted'), 'email');
+                return false;
+            }
+        }
+
+        return $verified;
+    }
 }

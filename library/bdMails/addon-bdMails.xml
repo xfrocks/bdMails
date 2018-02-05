@@ -215,6 +215,7 @@ $0]]></replace>
     <listener event_id="load_class_controller" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_ControllerAdmin_Tools" active="1" hint="XenForo_ControllerAdmin_Tools" description="XenForo_ControllerAdmin_Tools"/>
     <listener event_id="load_class_datawriter" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_DataWriter_User" active="1" hint="XenForo_DataWriter_User" description="XenForo_DataWriter_User"/>
     <listener event_id="load_class_mail" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_Mail" active="1" hint="XenForo_Mail" description="XenForo_Mail"/>
+    <listener event_id="load_class_model" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_Model_EmailBounce" active="1" hint="XenForo_Model_EmailBounce" description="XenForo_Model_EmailBounce"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="bdMails_Listener" callback_method="load_class_XenForo_Model_MailQueue" active="1" hint="XenForo_Model_MailQueue" description="XenForo_Model_MailQueue"/>
     <listener event_id="visitor_setup" execute_order="10" callback_class="bdMails_Listener" callback_method="visitor_setup" active="1" hint="" description=""/>
   </code_event_listeners>
@@ -228,6 +229,13 @@ $0]]></replace>
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="bdMails" display_order="1000"/>
+    </option>
+    <option option_id="bdMails_bounceLogTtl" edit_format="spinbox" data_type="integer" can_backup="1">
+      <default_value>-1</default_value>
+      <edit_format_params>min=-1
+step=30</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="bdMails" display_order="1010"/>
     </option>
     <option option_id="bdMails_hardenRegistration" edit_format="onoff" data_type="unsigned_integer" can_backup="1">
       <default_value>1</default_value>
@@ -293,6 +301,8 @@ $0]]></replace>
     <phrase title="bdmails_sendgrid_requires_username_and_password" version_id="2" version_string="0.9"><![CDATA[Provider SendGrid requires a valid username and password combination to work. Please enter your SendGrid account credentials.]]></phrase>
     <phrase title="bdmails_your_email_bounced_reason_x" version_id="2" version_string="0.9"><![CDATA[We cannot deliver emails to your address ({email}), the reason given by your provider is "{reason}". Please update your contact details with a deliverable address to keep updated with information from {boardTitle}.]]></phrase>
     <phrase title="option_bdMails_bounce" version_id="10" version_string="0.9.4"><![CDATA[Bounced Email Processing]]></phrase>
+    <phrase title="option_bdMails_bounceLogTtl" version_id="1000300" version_string="1.0.3"><![CDATA[Bounce Log TTL]]></phrase>
+    <phrase title="option_bdMails_bounceLogTtl_explain" version_id="1000300" version_string="1.0.3"><![CDATA[Enter the number of days to keep bounce logs. By default, XenForo keeps them for 30 days. Enter -1 to never prune logs.]]></phrase>
     <phrase title="option_bdMails_bounce_explain" version_id="13" version_string="0.9.5-BETA"><![CDATA[Enable this option to process bounce report from providers. List of supported providers: Amazon SES, Mailgun and Mandrill.]]></phrase>
     <phrase title="option_bdMails_hardenRegistration" version_id="1000200" version_string="1.0.2"><![CDATA[Hardened Registration]]></phrase>
     <phrase title="option_bdMails_hardenRegistration_explain" version_id="1000200" version_string="1.0.2"><![CDATA[Enable this option to harden the registration flow with SFS. User won't be able to register if his/her email address is blacklisted by SFS.]]></phrase>

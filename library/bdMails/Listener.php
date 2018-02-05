@@ -94,4 +94,11 @@ class bdMails_Listener
     {
         $hashes += bdMails_FileSums::getHashes();
     }
+
+    public static function load_class_XenForo_Model_EmailBounce($class, array &$extend)
+    {
+        if ($class === 'XenForo_Model_EmailBounce') {
+            $extend[] = 'bdMails_XenForo_Model_EmailBounce';
+        }
+    }
 }

@@ -1,3 +1,9 @@
+1.1.0 (12-11-2018)
+    1.1.0/1 added new option to control bounce log TTL
+    1.1.0/2 added new option to secure registration
+    1.1.0/3 improved Amazon SES handling
+    1.1.0/4 improved support for PHP 7
+
 1.0.1 (24-04-2016)
 	1.0.1/1 added support for Amazon SES quota and statistics
 	1.0.1/2 added new option to use sendmail with Amazon SES

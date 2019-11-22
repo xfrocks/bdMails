@@ -241,35 +241,31 @@ class bdMails_Transport_Mandrill extends bdMails_Transport_Abstract
         }
 
         foreach ($events as $event) {
-            switch ($event['event']) {
-                case 'hard_bounce':
-                case 'soft_bounce':
-                    if (!bdMails_Option::get('bounce')) {
-                        continue;
-                    }
-                    if (empty($event['msg'])) {
-                        continue;
-                    }
-                    $msgRef =& $event['msg'];
-
-                    $userId = XenForo_Application::getDb()->fetchOne(
-                        'SELECT user_id FROM xf_user WHERE email = ?',
-                        $msgRef['email']
-                    );
-                    if (empty($userId)) {
-                        continue;
-                    }
-
-                    $bounceType = ($event['event'] === 'hard_bounce' ? 'hard' : 'soft');
-                    $bounceDate = $msgRef['ts'];
-
-                    /** @var bdMails_Model_EmailBounce $emailBounceModel */
-                    $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
-                    $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($msgRef, array(
-                        'reason' => $msgRef['diag'],
-                    )));
-                    break;
+            if (!bdMails_Option::get('bounce') ||
+                empty($event['event']) ||
+                !in_array($event['event'], array('hard_bounce', 'soft_bounce'), true) ||
+                empty($event['msg'])
+            ) {
+                continue;
             }
+            $msgRef =& $event['msg'];
+
+            $userId = XenForo_Application::getDb()->fetchOne(
+                'SELECT user_id FROM xf_user WHERE email = ?',
+                $msgRef['email']
+            );
+            if (empty($userId)) {
+                continue;
+            }
+
+            $bounceType = ($event['event'] === 'hard_bounce' ? 'hard' : 'soft');
+            $bounceDate = $msgRef['ts'];
+
+            /** @var bdMails_Model_EmailBounce $emailBounceModel */
+            $emailBounceModel = XenForo_Model::create('bdMails_Model_EmailBounce');
+            $emailBounceModel->takeBounceAction($userId, $bounceType, $bounceDate, array_merge($msgRef, array(
+                'reason' => $msgRef['diag'],
+            )));
         }
 
         return true;

@@ -124,7 +124,7 @@ class bdMails_Transport_AmazonSes extends bdMails_Transport_Abstract
                     if (empty($recipient['status']) && empty($recipient['diagnosticCode'])) {
                         // ignore bounce notification without both status AND diagnostic code
                         // in practice, we found those to be incorrect
-                        XenForo_Error::logException(new Exception($contents), false, 'Amazon SES: ');
+                        XenForo_Error::logError($contents);
                         continue;
                     }
 
